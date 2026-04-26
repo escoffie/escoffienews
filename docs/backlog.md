@@ -40,7 +40,8 @@ This backlog follows a "Divide and Conquer" approach, organized by milestones. E
 ## Phase 6: Quality Assurance & Delivery [DEV-006]
 - [x] [DEV-601] Unit Tests for Services & Strategies.
 - [x] [DEV-602] Feature Tests for API Endpoints.
-- [/] [DEV-603] Documentation (README, Architectural Decisions).
+- [x] [DEV-603] Frontend Component Testing (Vitest + RTL).
+- [/] [DEV-604] Documentation (README, Architectural Decisions).
 
 ## Phase 7: Bonus - Security & Polish [DEV-007]
 - [ ] [DEV-701] Simple Admin Authentication layer.
