@@ -34,6 +34,6 @@ class NotificationLogRepository implements NotificationLogRepositoryInterface
      */
     public function getAllLogs(): Collection
     {
-        return NotificationLog::with('user')->latest()->get();
+        return NotificationLog::with('user')->orderByDesc('created_at')->orderByDesc('id')->get();
     }
 }

@@ -66,7 +66,7 @@ function App() {
         </main>
 
         <footer className="pt-8 border-t border-slate-800 flex justify-between items-center text-slate-500 text-xs">
-          <p>© 2024 LoanPro Notification System • Coding Challenge</p>
+          <p>© 2026 LoanPro Notification System • Coding Challenge</p>
           <div className="flex gap-4">
             <span className="hover:text-slate-300 cursor-pointer transition-colors">Documentation</span>
             <span className="hover:text-slate-300 cursor-pointer transition-colors">Support</span>
