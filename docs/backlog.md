@@ -10,10 +10,10 @@ This backlog follows a "Divide and Conquer" approach, organized by milestones. E
 ---
 
 ## Phase 1: Foundation & Environment [DEV-001]
-- [/] [DEV-101] Initialize Docker Environment (PHP 8.3, Nginx, MySQL/PostgreSQL, Reverb).
-- [/] [DEV-102] Laravel 11 Skeleton Setup (API Mode).
-- [/] [DEV-103] React (Vite) Skeleton Setup.
-- [/] [DEV-104] Git Repository Structure & Initial Commit.
+- [x] [DEV-101] Initialize Docker Environment (PHP 8.3, Nginx, MySQL/PostgreSQL, Reverb).
+- [x] [DEV-102] Laravel 11 Skeleton Setup (API Mode).
+- [x] [DEV-103] React (Vite) Skeleton Setup.
+- [x] [DEV-104] Git Repository Structure & Initial Commit.
 
 ## Phase 2: Domain & Data Modeling [DEV-002]
 - [ ] [DEV-201] Database Migrations (Users, Categories, Channels, NotificationLogs).
