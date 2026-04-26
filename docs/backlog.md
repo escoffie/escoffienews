@@ -21,15 +21,15 @@ This backlog follows a "Divide and Conquer" approach, organized by milestones. E
 - [x] [DEV-203] Define Domain Interfaces & DTOs (The "Contract").
 
 ## Phase 3: Core Notification Logic (The Strategy & Pub-Sub) [DEV-003]
-- [/] [DEV-301] Implement `MessageReceived` Event & `SendNotifications` Listener.
-- [/] [DEV-302] Implement Notification Strategy Pattern (Abstract + SMS/Email/Push).
-- [/] [DEV-303] Implement Repository Pattern for User & Log Persistence.
-- [/] [DEV-304] Implement Notification Service (Orchestrator).
+- [x] [DEV-301] Implement `MessageReceived` Event & `SendNotifications` Listener.
+- [x] [DEV-302] Implement Notification Strategy Pattern (Abstract + SMS/Email/Push).
+- [x] [DEV-303] Implement Repository Pattern for User & Log Persistence.
+- [x] [DEV-304] Implement Notification Service (Orchestrator).
 
 ## Phase 4: API & Real-time Integration [DEV-004]
-- [ ] [DEV-401] API Endpoint: POST `/api/notifications` (Message Submission).
-- [ ] [DEV-402] API Endpoint: GET `/api/logs` (History Retrieval).
-- [ ] [DEV-403] Configure Laravel Reverb for WebSocket Broadcasting.
+- [x] [DEV-401] API Endpoint: POST `/api/notifications` (Message Submission).
+- [x] [DEV-402] API Endpoint: GET `/api/logs` (History Retrieval).
+- [x] [DEV-403] Configure Laravel Reverb for WebSocket Broadcasting.
 
 ## Phase 5: Frontend Experience [DEV-005]
 - [ ] [DEV-501] UI: Message Submission Form (Validations included).
@@ -38,8 +38,8 @@ This backlog follows a "Divide and Conquer" approach, organized by milestones. E
 - [ ] [DEV-504] UI: "Terminal" Log Console for raw system output.
 
 ## Phase 6: Quality Assurance & Delivery [DEV-006]
-- [ ] [DEV-601] Unit Tests for Services & Strategies.
-- [ ] [DEV-602] Feature Tests for API Endpoints.
+- [x] [DEV-601] Unit Tests for Services & Strategies.
+- [x] [DEV-602] Feature Tests for API Endpoints.
 - [/] [DEV-603] Documentation (README, Architectural Decisions).
 
 ## Phase 7: Bonus - Security & Polish [DEV-007]
