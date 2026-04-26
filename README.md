@@ -21,6 +21,8 @@ The project follows a **Contract-First** approach with SOLID principles at its c
 - **Repository Pattern:** Abstracts data persistence to ensure the domain logic remains decoupled from the DB.
 - **DTOs & Interfaces:** Ensures strict typing and clear boundaries between layers.
 
+See the [Architecture & Data Models](docs/architecture.md) for a detailed ER diagram and flow description.
+
 ## 🛠 Setup Instructions
 
 ### Prerequisites

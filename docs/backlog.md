@@ -21,10 +21,10 @@ This backlog follows a "Divide and Conquer" approach, organized by milestones. E
 - [x] [DEV-203] Define Domain Interfaces & DTOs (The "Contract").
 
 ## Phase 3: Core Notification Logic (The Strategy & Pub-Sub) [DEV-003]
-- [ ] [DEV-301] Implement `MessageReceived` Event & `SendNotifications` Listener.
-- [ ] [DEV-302] Implement Notification Strategy Pattern (Abstract + SMS/Email/Push).
-- [ ] [DEV-303] Implement Repository Pattern for User & Log Persistence.
-- [ ] [DEV-304] Implement Notification Service (Orchestrator).
+- [/] [DEV-301] Implement `MessageReceived` Event & `SendNotifications` Listener.
+- [/] [DEV-302] Implement Notification Strategy Pattern (Abstract + SMS/Email/Push).
+- [/] [DEV-303] Implement Repository Pattern for User & Log Persistence.
+- [/] [DEV-304] Implement Notification Service (Orchestrator).
 
 ## Phase 4: API & Real-time Integration [DEV-004]
 - [ ] [DEV-401] API Endpoint: POST `/api/notifications` (Message Submission).
@@ -35,8 +35,12 @@ This backlog follows a "Divide and Conquer" approach, organized by milestones. E
 - [ ] [DEV-501] UI: Message Submission Form (Validations included).
 - [ ] [DEV-502] UI: Real-time Log Table (WebSocket integration).
 - [ ] [DEV-503] UI: Design Polish & Responsiveness.
+- [ ] [DEV-504] UI: "Terminal" Log Console for raw system output.
 
 ## Phase 6: Quality Assurance & Delivery [DEV-006]
 - [ ] [DEV-601] Unit Tests for Services & Strategies.
 - [ ] [DEV-602] Feature Tests for API Endpoints.
 - [/] [DEV-603] Documentation (README, Architectural Decisions).
+
+## Phase 7: Bonus - Security & Polish [DEV-007]
+- [ ] [DEV-701] Simple Admin Authentication layer.
