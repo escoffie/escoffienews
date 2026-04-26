@@ -22,8 +22,8 @@ abstract class AbstractNotificationProvider implements NotificationProviderInter
             $success = $this->deliver($data);
             
             if ($success) {
-                $this->logRepository->log($data);
-                // Here we could also fire a SystemLog event for the terminal view
+                $log = $this->logRepository->log($data);
+                event(new \App\Events\NotificationLogged($log));
             }
 
             return $success;

@@ -11,9 +11,9 @@ interface NotificationLogRepositoryInterface
      * Store a notification log entry.
      *
      * @param NotificationData $data
-     * @return void
+     * @return \App\Models\NotificationLog
      */
-    public function log(NotificationData $data): void;
+    public function log(NotificationData $data): \App\Models\NotificationLog;
 
     /**
      * Get all logs ordered by newest.

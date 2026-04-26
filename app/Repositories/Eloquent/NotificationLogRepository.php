@@ -13,11 +13,11 @@ class NotificationLogRepository implements NotificationLogRepositoryInterface
      * Store a notification log entry.
      *
      * @param NotificationData $data
-     * @return void
+     * @return NotificationLog
      */
-    public function log(NotificationData $data): void
+    public function log(NotificationData $data): NotificationLog
     {
-        NotificationLog::create([
+        return NotificationLog::create([
             'user_id' => $data->userId,
             'user_name' => $data->userName,
             'user_email' => $data->userEmail,

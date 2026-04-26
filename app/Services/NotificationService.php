@@ -29,11 +29,16 @@ class NotificationService
      */
     public function notifyByCategory(string $category, string $message): void
     {
+        event(new \App\Events\SystemLogBroadcast('INFO', "Initiating notification process for category: {$category}"));
+        
         $users = $this->userRepository->getSubscribersByCategory($category);
+        
+        event(new \App\Events\SystemLogBroadcast('INFO', "Found " . $users->count() . " subscribers for {$category}"));
 
         foreach ($users as $user) {
             foreach ($user->channels as $channel) {
                 if (isset($this->providers[$channel->name])) {
+                    event(new \App\Events\SystemLogBroadcast('INFO', "Routing message to {$user->name} via {$channel->name}"));
                     $data = new NotificationData(
                         userId: $user->id,
                         userName: $user->name,
