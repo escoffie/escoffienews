@@ -1,4 +1,4 @@
-# LoanPro Notification System
+# EscoffieNews Notification System
 
 A high-performance, scalable notification routing system built with Laravel 11, React, and WebSockets.
 

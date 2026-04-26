@@ -32,7 +32,7 @@ function App() {
             </div>
             <div>
               <h1 className="text-3xl font-black text-white tracking-tight">
-                LOAN<span className="text-brand-primary">PRO</span> <span className="font-light text-slate-500">NOTIFY</span>
+                ESCOFFIE<span className="text-brand-primary">NEWS</span> <span className="font-light text-slate-500">NOTIFY</span>
               </h1>
               <p className="text-slate-400 text-sm font-medium flex items-center gap-2">
                 <Activity size={14} className="text-emerald-500" />
@@ -80,7 +80,7 @@ function App() {
         </main>
 
         <footer className="pt-8 border-t border-slate-800 flex justify-between items-center text-slate-500 text-xs">
-          <p>© 2026 LoanPro Notification System • Coding Challenge</p>
+          <p>© 2026 EscoffieNews Notification System • Coding Challenge</p>
           <div className="flex gap-4">
             <span className="hover:text-slate-300 cursor-pointer transition-colors">Documentation</span>
             <span className="hover:text-slate-300 cursor-pointer transition-colors">Support</span>

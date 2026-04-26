@@ -10,7 +10,7 @@ export const SystemTerminal = () => {
         const channel = echo.channel('system-logs')
             .listen('.system.log', (e) => {
                 const timestamp = new Date().toLocaleTimeString();
-                setLogs(prev => [...prev, { ...e, timestamp }]);
+                setLogs(prev => [...prev, { ...e, timestamp }].slice(-100));
             });
 
         return () => {

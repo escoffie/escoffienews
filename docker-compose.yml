@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: docker/php/Dockerfile
-    container_name: loanpro_app
+    container_name: escoffienews_app
     restart: unless-stopped
     tty: true
     environment:
@@ -17,12 +17,12 @@ services:
       - .:/var/www
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
-      - loanpro_network
+      - escoffienews_network
 
   # Nginx Web Server
   web:
     image: nginx:alpine
-    container_name: loanpro_web
+    container_name: escoffienews_web
     restart: unless-stopped
     tty: true
     ports:
@@ -31,14 +31,14 @@ services:
       - .:/var/www
       - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
     networks:
-      - loanpro_network
+      - escoffienews_network
 
   # Reverb WebSocket Server
   reverb:
     build:
       context: .
       dockerfile: docker/php/Dockerfile
-    container_name: loanpro_reverb
+    container_name: escoffienews_reverb
     restart: unless-stopped
     working_dir: /var/www
     command: php artisan reverb:start --host=0.0.0.0 --port=8080
@@ -47,7 +47,7 @@ services:
     volumes:
       - .:/var/www
     networks:
-      - loanpro_network
+      - escoffienews_network
     depends_on:
       - db
       - redis
@@ -55,33 +55,33 @@ services:
   # Database
   db:
     image: mysql:8.0
-    container_name: loanpro_db
+    container_name: escoffienews_db
     restart: unless-stopped
     tty: true
     ports:
       - "3306:3306"
     environment:
-      MYSQL_DATABASE: loanpro
+      MYSQL_DATABASE: escoffienews
       MYSQL_ROOT_PASSWORD: root
       MYSQL_PASSWORD: root
-      MYSQL_USER: loanpro
+      MYSQL_USER: escoffienews
     volumes:
       - dbdata:/var/lib/mysql
     networks:
-      - loanpro_network
+      - escoffienews_network
 
   # Redis for Queue/Cache/Broadcasting
   redis:
     image: redis:alpine
-    container_name: loanpro_redis
+    container_name: escoffienews_redis
     restart: unless-stopped
     networks:
-      - loanpro_network
+      - escoffienews_network
 
   # Frontend (React)
   frontend:
     image: node:20-alpine
-    container_name: loanpro_frontend
+    container_name: escoffienews_frontend
     restart: unless-stopped
     working_dir: /app
     volumes:
@@ -90,10 +90,10 @@ services:
       - "3000:3000"
     command: sh -c "npm install && npm run dev -- --host"
     networks:
-      - loanpro_network
+      - escoffienews_network
 
 networks:
-  loanpro_network:
+  escoffienews_network:
     driver: bridge
 
 volumes:

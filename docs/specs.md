@@ -1,4 +1,4 @@
-# LoanPro Software Engineer Challenge
+# EscoffieNews Software Engineer Challenge
 
 ## We will evaluate:
 * **Best practices:** Validations and dealing with exceptions, Intuitive names and OOP.
