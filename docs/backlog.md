@@ -16,9 +16,9 @@ This backlog follows a "Divide and Conquer" approach, organized by milestones. E
 - [x] [DEV-104] Git Repository Structure & Initial Commit.
 
 ## Phase 2: Domain & Data Modeling [DEV-002]
-- [ ] [DEV-201] Database Migrations (Users, Categories, Channels, NotificationLogs).
-- [ ] [DEV-202] Seeders for Catalog Data (Mock Users & Categories).
-- [ ] [DEV-203] Define Domain Interfaces & DTOs (The "Contract").
+- [x] [DEV-201] Database Migrations (Users, Categories, Channels, NotificationLogs).
+- [x] [DEV-202] Seeders for Catalog Data (Mock Users & Categories).
+- [x] [DEV-203] Define Domain Interfaces & DTOs (The "Contract").
 
 ## Phase 3: Core Notification Logic (The Strategy & Pub-Sub) [DEV-003]
 - [ ] [DEV-301] Implement `MessageReceived` Event & `SendNotifications` Listener.
