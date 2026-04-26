@@ -27,12 +27,30 @@ services:
     tty: true
     ports:
       - "8000:80"
-      - "8080:8080"
     volumes:
       - .:/var/www
       - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
     networks:
       - loanpro_network
+
+  # Reverb WebSocket Server
+  reverb:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: loanpro_reverb
+    restart: unless-stopped
+    working_dir: /var/www
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/var/www
+    networks:
+      - loanpro_network
+    depends_on:
+      - db
+      - redis
 
   # Database
   db:

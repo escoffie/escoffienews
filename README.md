@@ -7,10 +7,11 @@ A high-performance, scalable notification routing system built with Laravel 11, 
 This system allows sending messages to specific categories (Sports, Finance, Movies) and automatically routes them to subscribed users via their preferred channels (SMS, Email, Push).
 
 ### Core Features
-- **Real-time Updates:** Uses Laravel Reverb (WebSockets) to update the log history instantly.
-- **Clean Architecture:** Strict separation of concerns using Service, Repository, and Strategy patterns.
-- **Robust Testing:** High coverage with unit and feature tests.
-- **Dockerized:** Fully containerized for easy setup and review.
+- **Laravel 11:** Core API with PHP 8.4.
+- **React 19:** SPA with Vite and Tailwind CSS v4.
+- **Laravel Reverb:** High-performance WebSocket server for real-time monitoring.
+- **Design Patterns:** Strategy (Notification Providers), Pub-Sub (Event-driven orchestration), and Repository (Data Abstraction).
+- **Docker:** Fully containerized environment using OrbStack/Docker Compose.
 
 ## 🏗 Architecture
 
@@ -29,31 +30,25 @@ See the [Architecture & Data Models](docs/architecture.md) for a detailed ER dia
 - Docker & OrbStack (or Docker Desktop)
 - Make (optional, but recommended)
 
-### Quick Start
-1. **Clone the repository:**
+### 🚀 Running the App
+
+1. **Start all services:**
    ```bash
-   git clone <repo-url>
-   cd LoanPro
+   docker-compose up -d
    ```
 
-2. **Initialize the environment:**
-   ```bash
-   make setup
-   ```
-   *This will build the containers, install dependencies, run migrations, and seed the database.*
+2. **Access the Frontend:**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-3. **Start the application:**
-   ```bash
-   make up
-   ```
+3. **Access the API:**
+   The backend is available at [http://localhost:8000](http://localhost:8000)
 
-4. **Access the application:**
-   - **Frontend:** [http://localhost:3000](http://localhost:3000)
-   - **API:** [http://localhost:8000](http://localhost:8000)
+4. **WebSockets (Real-time):**
+   Reverb is running on [ws://localhost:8080](ws://localhost:8080)
 
-## 🧪 Running Tests
+### 🧪 Running Tests
 ```bash
-make test
+docker-compose exec app php artisan test
 ```
 
 ## 📄 License

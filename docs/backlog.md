@@ -32,10 +32,10 @@ This backlog follows a "Divide and Conquer" approach, organized by milestones. E
 - [x] [DEV-403] Configure Laravel Reverb for WebSocket Broadcasting.
 
 ## Phase 5: Frontend Experience [DEV-005]
-- [ ] [DEV-501] UI: Message Submission Form (Validations included).
-- [ ] [DEV-502] UI: Real-time Log Table (WebSocket integration).
-- [ ] [DEV-503] UI: Design Polish & Responsiveness.
-- [ ] [DEV-504] UI: "Terminal" Log Console for raw system output.
+- [x] [DEV-501] UI: Message Submission Form (Validations included).
+- [x] [DEV-502] UI: Real-time Log Table (WebSocket integration).
+- [x] [DEV-503] UI: Design Polish & Responsiveness.
+- [x] [DEV-504] UI: "Terminal" Log Console for raw system output.
 
 ## Phase 6: Quality Assurance & Delivery [DEV-006]
 - [x] [DEV-601] Unit Tests for Services & Strategies.
