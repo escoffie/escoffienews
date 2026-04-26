@@ -12,3 +12,4 @@ homestead.json
 homestead.yaml
 auth.json
 .DS_Store
+frontend/dist/

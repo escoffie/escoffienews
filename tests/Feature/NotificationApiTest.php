@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\CategoryType;
 use App\Events\MessageReceived;
+use App\Models\Category;
 use App\Models\NotificationLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -29,6 +30,9 @@ class NotificationApiTest extends TestCase
     {
         Event::fake();
 
+        // Create the category in the database for the validation check
+        Category::create(['name' => CategoryType::FINANCE->value]);
+
         $response = $this->postJson('/api/notifications', [
             'category' => CategoryType::FINANCE->value,
             'message' => 'Your bill is ready.'
@@ -41,6 +45,18 @@ class NotificationApiTest extends TestCase
             return $event->category === CategoryType::FINANCE->value &&
                    $event->message === 'Your bill is ready.';
         });
+    }
+
+    public function test_it_fails_validation_if_category_does_not_exist_in_database(): void
+    {
+        // Even if passed category is valid in Enum, it should fail if not in DB
+        $response = $this->postJson('/api/notifications', [
+            'category' => CategoryType::SPORTS->value,
+            'message' => 'Test message'
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['category']);
     }
 
     public function test_it_can_retrieve_notification_logs(): void

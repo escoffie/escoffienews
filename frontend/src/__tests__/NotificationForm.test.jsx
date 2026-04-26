@@ -4,10 +4,24 @@ import { NotificationForm } from '../components/NotificationForm';
 import api from '../lib/api';
 
 describe('NotificationForm', () => {
-    it('renders category selection and message textarea', () => {
+    beforeEach(() => {
+        api.get.mockResolvedValue({ 
+            data: [
+                { id: 1, name: 'Sports' },
+                { id: 2, name: 'Finance' },
+                { id: 3, name: 'Movies' }
+            ] 
+        });
+    });
+
+    it('renders category selection and message textarea', async () => {
         render(<NotificationForm />);
         
-        expect(screen.getByText(/Select Category/i)).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText(/Select Category/i)).toBeInTheDocument();
+            expect(screen.getByText('Sports')).toBeInTheDocument();
+        });
+        
         expect(screen.getByPlaceholderText(/Enter the notification message here/i)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Send Notification/i })).toBeInTheDocument();
     });
@@ -17,6 +31,11 @@ describe('NotificationForm', () => {
         
         render(<NotificationForm />);
         
+        // Wait for categories
+        await waitFor(() => {
+            expect(screen.getByText('Sports')).toBeInTheDocument();
+        });
+
         // Select category
         fireEvent.click(screen.getByText('Sports'));
         
@@ -44,6 +63,11 @@ describe('NotificationForm', () => {
         
         render(<NotificationForm />);
         
+        // Wait for categories
+        await waitFor(() => {
+            expect(screen.getByText('Finance')).toBeInTheDocument();
+        });
+
         fireEvent.click(screen.getByText('Finance'));
         fireEvent.change(screen.getByPlaceholderText(/Enter the notification message here/i), {
             target: { value: 'Error Test' }

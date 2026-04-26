@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Contracts\Repositories\NotificationLogRepositoryInterface;
-use App\Enums\CategoryType;
 use App\Events\MessageReceived;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -30,7 +29,7 @@ class NotificationController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'category' => ['required', 'string', Rule::in(CategoryType::values())],
+            'category' => ['required', 'string', Rule::exists('categories', 'name')],
             'message' => ['required', 'string', 'min:1'],
         ]);
 

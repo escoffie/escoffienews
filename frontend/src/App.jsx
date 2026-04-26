@@ -1,11 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { GlassCard } from './components/GlassCard';
 import { NotificationForm } from './components/NotificationForm';
 import { NotificationLogTable } from './components/NotificationLogTable';
 import { SystemTerminal } from './components/SystemTerminal';
 import { Zap, Activity } from 'lucide-react';
+import { echo } from './lib/echo';
 
 function App() {
+  const [isConnected, setIsConnected] = useState(false);
+
+  useEffect(() => {
+    // Listen for pusher state changes
+    if (echo.connector.pusher.connection) {
+      setIsConnected(echo.connector.pusher.connection.state === 'connected');
+      
+      echo.connector.pusher.connection.bind('state_change', (states) => {
+        setIsConnected(states.current === 'connected');
+      });
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#0f172a] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-900 to-black p-6 lg:p-12">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -36,8 +50,8 @@ function App() {
             <div className="flex flex-col items-end">
               <span className="text-slate-500 uppercase text-[10px] font-bold tracking-widest">Status</span>
               <span className="text-white flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                Live Sync
+                <span className={`h-2 w-2 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
+                {isConnected ? 'Live Sync' : 'Disconnected'}
               </span>
             </div>
           </div>

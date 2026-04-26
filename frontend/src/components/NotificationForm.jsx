@@ -1,18 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Send, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import api from '../lib/api';
 
-const CATEGORIES = [
-    { value: 'Sports', label: 'Sports', color: 'text-orange-400 bg-orange-400/10' },
-    { value: 'Finance', label: 'Finance', color: 'text-emerald-400 bg-emerald-400/10' },
-    { value: 'Movies', label: 'Movies', color: 'text-purple-400 bg-purple-400/10' },
+const CATEGORY_COLORS = [
+    'text-orange-400 bg-orange-400/10',
+    'text-emerald-400 bg-emerald-400/10',
+    'text-purple-400 bg-purple-400/10',
+    'text-blue-400 bg-blue-400/10',
+    'text-pink-400 bg-pink-400/10'
 ];
 
 export const NotificationForm = () => {
+    const [categories, setCategories] = useState([]);
     const [category, setCategory] = useState('');
     const [message, setMessage] = useState('');
     const [status, setStatus] = useState('idle'); // idle, loading, success, error
     const [errorMsg, setErrorMsg] = useState('');
+
+    useEffect(() => {
+        api.get('/categories')
+           .then(res => setCategories(res.data))
+           .catch(err => console.error('Failed to load categories', err));
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -37,19 +46,19 @@ export const NotificationForm = () => {
                     Select Category
                 </label>
                 <div className="grid grid-cols-3 gap-3">
-                    {CATEGORIES.map((cat) => (
+                    {categories.map((cat, idx) => (
                         <button
-                            key={cat.value}
+                            key={cat.id || cat.name}
                             type="button"
-                            onClick={() => setCategory(cat.value)}
+                            onClick={() => setCategory(cat.name)}
                             className={`px-4 py-3 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
-                                category === cat.value 
+                                category === cat.name 
                                 ? 'border-brand-primary bg-brand-primary/10 shadow-[0_0_20px_rgba(59,130,246,0.3)]' 
                                 : 'border-slate-700 bg-slate-800/50 hover:border-slate-600'
                             }`}
                         >
-                            <span className={`text-xs font-bold uppercase ${cat.color} px-2 py-0.5 rounded`}>
-                                {cat.label}
+                            <span className={`text-xs font-bold uppercase ${CATEGORY_COLORS[idx % CATEGORY_COLORS.length]} px-2 py-0.5 rounded`}>
+                                {cat.name}
                             </span>
                         </button>
                     ))}
