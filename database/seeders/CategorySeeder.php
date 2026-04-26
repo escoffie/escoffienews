@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Enums\CategoryType;
+use App\Models\Category;
 use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
@@ -12,9 +13,8 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        $categories = ['Sports', 'Finance', 'Movies'];
-        foreach ($categories as $category) {
-            \App\Models\Category::create(['name' => $category]);
+        foreach (CategoryType::cases() as $category) {
+            Category::create(['name' => $category->value]);
         }
     }
 }

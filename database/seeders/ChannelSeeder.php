@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Enums\ChannelType;
+use App\Models\Channel;
 use Illuminate\Database\Seeder;
 
 class ChannelSeeder extends Seeder
@@ -12,9 +13,8 @@ class ChannelSeeder extends Seeder
      */
     public function run(): void
     {
-        $channels = ['SMS', 'E-Mail', 'Push Notification'];
-        foreach ($channels as $channel) {
-            \App\Models\Channel::create(['name' => $channel]);
+        foreach (ChannelType::cases() as $channel) {
+            Channel::create(['name' => $channel->value]);
         }
     }
 }
