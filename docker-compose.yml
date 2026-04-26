@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # PHP Application
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: loanpro_app
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - loanpro_network
+
+  # Nginx Web Server
+  web:
+    image: nginx:alpine
+    container_name: loanpro_web
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - loanpro_network
+
+  # Database
+  db:
+    image: mysql:8.0
+    container_name: loanpro_db
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: loanpro
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+      MYSQL_USER: loanpro
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - loanpro_network
+
+  # Redis for Queue/Cache/Broadcasting
+  redis:
+    image: redis:alpine
+    container_name: loanpro_redis
+    restart: unless-stopped
+    networks:
+      - loanpro_network
+
+networks:
+  loanpro_network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
