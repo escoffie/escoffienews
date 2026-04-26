@@ -4,6 +4,7 @@ namespace App\Notifications\Channels;
 
 use App\Contracts\Repositories\NotificationLogRepositoryInterface;
 use App\DTOs\NotificationData;
+use App\Events\NotificationLogged;
 use App\Notifications\Channels\Contracts\NotificationProviderInterface;
 use Illuminate\Support\Facades\Log;
 
@@ -20,10 +21,10 @@ abstract class AbstractNotificationProvider implements NotificationProviderInter
     {
         try {
             $success = $this->deliver($data);
-            
+
             if ($success) {
                 $log = $this->logRepository->log($data);
-                event(new \App\Events\NotificationLogged($log));
+                event(new NotificationLogged($log));
             }
 
             return $success;
