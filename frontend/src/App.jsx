@@ -96,11 +96,13 @@ function App() {
             <UserManagement />
           </div>
 
-          {/* Right Column: History */}
-          <div className="lg:col-span-7 flex flex-col">
-            <GlassCard className="p-8 flex-1">
-              <NotificationLogTable />
-            </GlassCard>
+          {/* Right Column: History — sticky, same visual height as left column */}
+          <div className="lg:col-span-7">
+            <div className="sticky top-8 h-[calc(100vh-8rem)]">
+              <GlassCard className="p-8 h-full flex flex-col">
+                <NotificationLogTable />
+              </GlassCard>
+            </div>
           </div>
 
         </main>
