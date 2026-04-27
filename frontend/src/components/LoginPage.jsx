@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, LogIn, ShieldCheck, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { TIMEOUTS } from '../lib/constants';
 
 export const LoginPage = ({ onLogin }) => {
     const [token, setToken] = useState('');
@@ -18,12 +19,12 @@ export const LoginPage = ({ onLogin }) => {
             setTimeout(() => {
                 localStorage.setItem('admin_token', token);
                 onLogin();
-            }, 800);
+            }, TIMEOUTS.AUTH_SIMULATION_MS);
         } else {
             setTimeout(() => {
                 setError('Invalid administrator token.');
                 setIsLoading(false);
-            }, 500);
+            }, TIMEOUTS.AUTH_SIMULATION_MS / 2);
         }
     };
 

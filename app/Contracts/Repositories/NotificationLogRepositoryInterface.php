@@ -3,6 +3,7 @@
 namespace App\Contracts\Repositories;
 
 use App\DTOs\NotificationData;
+use App\Enums\NotificationStatus;
 use App\Models\NotificationLog;
 use Illuminate\Support\Collection;
 
@@ -13,10 +14,10 @@ interface NotificationLogRepositoryInterface
      *
      * @param NotificationData $data
      * @param int $attempts
-     * @param string $status
+     * @param string|NotificationStatus $status
      * @return NotificationLog
      */
-    public function log(NotificationData $data, int $attempts = 1, string $status = 'sent'): NotificationLog;
+    public function log(NotificationData $data, int $attempts = 1, string|NotificationStatus $status = NotificationStatus::SENT): NotificationLog;
 
     /**
      * Get all logs ordered by newest.

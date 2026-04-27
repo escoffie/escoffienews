@@ -6,6 +6,7 @@ use App\DTOs\NotificationData;
 use App\Models\User;
 use App\Repositories\Eloquent\NotificationLogRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Enums\NotificationStatus;
 use Tests\TestCase;
 
 class NotificationLogRepositoryTest extends TestCase
@@ -37,14 +38,14 @@ class NotificationLogRepositoryTest extends TestCase
         );
 
         // 3. Act
-        $log = $this->repository->log($data, 2, 'failed');
+        $log = $this->repository->log($data, 2, NotificationStatus::FAILED);
 
         // 4. Assert
         $this->assertDatabaseHas('notification_logs', [
             'id' => $log->id,
             'batch_id' => 'uuid-1',
             'attempts' => 2,
-            'status' => 'failed',
+            'status' => NotificationStatus::FAILED->value,
             'message' => 'Hello'
         ]);
     }
@@ -86,7 +87,7 @@ class NotificationLogRepositoryTest extends TestCase
             userPhone: '999'
         );
 
-        $log = $this->repository->log($data, 1, 'sent');
+        $log = $this->repository->log($data, 1, NotificationStatus::SENT);
 
         $this->assertEquals('uuid-3', $log->batch_id);
         $this->assertEquals($user->id, $log->user_id);
@@ -96,7 +97,7 @@ class NotificationLogRepositoryTest extends TestCase
         $this->assertEquals('E-Mail', $log->channel);
         $this->assertEquals('Match starts at 8pm', $log->message);
         $this->assertEquals(1, $log->attempts);
-        $this->assertEquals('sent', $log->status);
+        $this->assertEquals(NotificationStatus::SENT->value, $log->status);
     }
 
     public function test_get_all_logs_returns_empty_collection_when_no_logs(): void

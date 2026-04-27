@@ -3,6 +3,7 @@ import { History, Mail, MessageSquare, Bell, Clock, Trash2, AlertTriangle, Alert
 import { echo } from '../lib/echo';
 import api from '../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
+import { UI_LIMITS, NOTIFICATION_STATUS } from '../lib/constants';
 
 export const NotificationLogTable = () => {
     const [logs, setLogs] = useState([]);
@@ -17,7 +18,7 @@ export const NotificationLogTable = () => {
         // Listen for new logs
         const channel = echo.channel('notifications')
             .listen('.notification.logged', (e) => {
-                setLogs(prev => [e.log, ...prev].slice(0, 100)); // Cap at 100
+                setLogs(prev => [e.log, ...prev].slice(0, UI_LIMITS.LOG_HISTORY_CAP));
             });
 
         return () => {
@@ -91,7 +92,7 @@ export const NotificationLogTable = () => {
                     <tbody>
                         <AnimatePresence initial={false}>
                             {logsWithGrouping.map((log) => {
-                                const isFailed = log.status === 'failed';
+                                const isFailed = log.status === NOTIFICATION_STATUS.FAILED;
                                 const isEvenGroup = log.groupIdx === 0;
                                 
                                 // Higher contrast backgrounds

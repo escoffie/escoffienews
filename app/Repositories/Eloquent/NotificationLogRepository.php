@@ -4,20 +4,23 @@ namespace App\Repositories\Eloquent;
 
 use App\Contracts\Repositories\NotificationLogRepositoryInterface;
 use App\DTOs\NotificationData;
+use App\Enums\NotificationStatus;
 use App\Models\NotificationLog;
 use Illuminate\Support\Collection;
 
 class NotificationLogRepository implements NotificationLogRepositoryInterface
 {
+    private const DEFAULT_LOG_LIMIT = 100;
+
     /**
      * Store a notification log entry.
      *
      * @param NotificationData $data
      * @param int $attempts
-     * @param string $status
+     * @param string|NotificationStatus $status
      * @return NotificationLog
      */
-    public function log(NotificationData $data, int $attempts = 1, string $status = 'sent'): NotificationLog
+    public function log(NotificationData $data, int $attempts = 1, string|NotificationStatus $status = NotificationStatus::SENT): NotificationLog
     {
         return NotificationLog::create([
             'batch_id' => $data->batchId,
@@ -28,7 +31,7 @@ class NotificationLogRepository implements NotificationLogRepositoryInterface
             'channel' => $data->channel,
             'message' => $data->message,
             'attempts' => $attempts,
-            'status' => $status,
+            'status' => $status instanceof NotificationStatus ? $status->value : $status,
         ]);
     }
 
@@ -39,7 +42,11 @@ class NotificationLogRepository implements NotificationLogRepositoryInterface
      */
     public function getAllLogs(): Collection
     {
-        return NotificationLog::with('user')->orderByDesc('created_at')->orderByDesc('id')->limit(100)->get();
+        return NotificationLog::with('user')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->limit(self::DEFAULT_LOG_LIMIT)
+            ->get();
     }
 
     /**

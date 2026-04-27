@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Terminal as TerminalIcon, Circle } from 'lucide-react';
 import { echo } from '../lib/echo';
+import { UI_LIMITS } from '../lib/constants';
 
 export const SystemTerminal = () => {
     const [logs, setLogs] = useState([]);
@@ -10,7 +11,7 @@ export const SystemTerminal = () => {
         const channel = echo.channel('system-logs')
             .listen('.system.log', (e) => {
                 const timestamp = new Date().toLocaleTimeString();
-                setLogs(prev => [...prev, { ...e, timestamp }].slice(-100));
+                setLogs(prev => [...prev, { ...e, timestamp }].slice(-UI_LIMITS.SYSTEM_TRACE_CAP));
             });
 
         return () => {

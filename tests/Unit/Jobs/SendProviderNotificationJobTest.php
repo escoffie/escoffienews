@@ -10,6 +10,7 @@ use App\Models\NotificationLog;
 use App\Notifications\Channels\SmsProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use App\Enums\NotificationStatus;
 use Tests\TestCase;
 
 class SendProviderNotificationJobTest extends TestCase
@@ -39,7 +40,7 @@ class SendProviderNotificationJobTest extends TestCase
         $mockRepo = $this->createMock(NotificationLogRepositoryInterface::class);
         $mockRepo->expects($this->once())
             ->method('log')
-            ->with($data, 1, 'sent')
+            ->with($data, 1, NotificationStatus::SENT)
             ->willReturn(new NotificationLog());
         $this->app->instance(NotificationLogRepositoryInterface::class, $mockRepo);
 
@@ -87,7 +88,7 @@ class SendProviderNotificationJobTest extends TestCase
         $mockRepo = $this->createMock(NotificationLogRepositoryInterface::class);
         $mockRepo->expects($this->once())
             ->method('log')
-            ->with($data, 1, 'failed')
+            ->with($data, 1, NotificationStatus::FAILED)
             ->willReturn(new NotificationLog());
         $this->app->instance(NotificationLogRepositoryInterface::class, $mockRepo);
 

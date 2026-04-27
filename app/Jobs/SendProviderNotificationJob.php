@@ -9,21 +9,26 @@ use App\Events\SystemLogBroadcast;
 use App\Notifications\Channels\Contracts\NotificationProviderInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use App\Enums\NotificationStatus;
 use Illuminate\Support\Facades\Log;
 
 class SendProviderNotificationJob implements ShouldQueue
 {
     use Queueable;
 
+    private const MAX_TRIES = 3;
+    private const RETRY_BACKOFF_SECONDS = [5, 10, 20];
+    private const CHAOS_MONKEY_FAIL_PERCENTAGE = 30;
+
     /**
      * Max number of times this job will be attempted before being marked as failed.
      */
-    public int $tries = 3;
+    public int $tries = self::MAX_TRIES;
 
     /**
      * Number of seconds to wait before retrying the job (backoff sequence).
      */
-    public array $backoff = [5, 10, 20];
+    public array $backoff = self::RETRY_BACKOFF_SECONDS;
 
     /**
      * Create a new job instance.
@@ -51,7 +56,7 @@ class SendProviderNotificationJob implements ShouldQueue
 
         // Chaos Monkey: randomly simulate a provider failure by throwing an exception.
         // This forces the Queue Worker to catch it and schedule a retry.
-        if ($this->chaosMonkey && rand(1, 100) <= 30) {
+        if ($this->chaosMonkey && rand(1, 100) <= self::CHAOS_MONKEY_FAIL_PERCENTAGE) {
             throw new \RuntimeException("Chaos Monkey intercepted [{$this->channelName}] for {$this->data->userName}. Will retry...");
         }
 
@@ -69,7 +74,7 @@ class SendProviderNotificationJob implements ShouldQueue
         $success = $provider->send($this->data);
 
         if ($success) {
-            $log = $logRepository->log($this->data, $this->attempts(), 'sent');
+            $log = $logRepository->log($this->data, $this->attempts(), NotificationStatus::SENT);
             event(new NotificationLogged($log));
             event(new SystemLogBroadcast('INFO', "Delivered [{$this->channelName}] to {$this->data->userName}."));
         }
@@ -88,7 +93,7 @@ class SendProviderNotificationJob implements ShouldQueue
 
         // Log the permanent failure to history
         $logRepository = app(NotificationLogRepositoryInterface::class);
-        $log = $logRepository->log($this->data, $this->attempts(), 'failed');
+        $log = $logRepository->log($this->data, $this->attempts(), NotificationStatus::FAILED);
         event(new NotificationLogged($log));
 
         event(new SystemLogBroadcast(
