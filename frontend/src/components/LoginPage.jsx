@@ -100,8 +100,8 @@ export const LoginPage = ({ onLogin }) => {
                 </div>
 
                 <div className="mt-8 text-center">
-                    <p className="text-slate-600 text-xs uppercase tracking-widest font-bold">
-                        Powered by Antigravity AI
+                    <p className="text-slate-600 text-[10px] uppercase tracking-widest font-bold">
+                        Your access token is defined in your <code className="text-slate-500">.env</code> file
                     </p>
                 </div>
             </motion.div>
