@@ -86,6 +86,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Admin Security Token
+    |--------------------------------------------------------------------------
+    |
+    | This token is used by the AdminAuthMiddleware to protect API routes.
+    |
+    | WARNING: In a real production app, this would be handled by a proper
+    | authentication system (like Laravel Sanctum or Passport).
+    |
+    */
+
+    'admin_token' => env('ADMIN_TOKEN', 'escoffie_secret_2026'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Encryption Key
     |--------------------------------------------------------------------------
     |

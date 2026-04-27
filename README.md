@@ -18,6 +18,7 @@ EscoffieNews receives messages for a given category (Sports, Finance, Movies) an
 | **Queue Workers** | Async delivery via `SendProviderNotificationJob` |
 | **Retry Logic** | 3 attempts with exponential backoff (5s → 10s → 20s) |
 | **Chaos Monkey** | Controlled failure simulation to test fault tolerance live |
+| **Security** | Simple Token-based authentication for API & Dashboard |
 | **Docker** | Fully containerized — runs with a single command |
 
 ---
@@ -106,7 +107,7 @@ docker-compose exec app php artisan test
 docker-compose exec frontend npm test
 ```
 
-**Current Coverage:** 43 backend tests · 21 frontend tests — all passing.
+**Current Coverage:** 46 backend tests · 24 frontend tests — all passing.
 
 ---
 

@@ -15,7 +15,7 @@ class AdminAuthMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $token = env('ADMIN_TOKEN');
+        $token = config('app.admin_token');
         
         if ($request->header('Authorization') !== $token) {
             return response()->json(['message' => 'Unauthorized. Invalid admin token.'], 401);
