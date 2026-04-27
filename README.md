@@ -125,9 +125,10 @@ When Chaos Monkey mode is enabled, each background delivery job has a **30% chan
 ### How to Use It
 
 1. **Open** [http://localhost:3000](http://localhost:3000).
-2. In the **Send Notification** panel, select a **Category** and type a **Message**.
-3. Toggle the **🐒 Chaos Monkey Mode** switch to ON (it turns red).
-4. Click **Send Notification**.
+2. **Login**: Enter the administrator token defined in your `.env` file (Default: `escoffie_secret_2026`).
+3. In the **Send Notification** panel, select a **Category** and type a **Message**.
+4. Toggle the **🐒 Chaos Monkey Mode** switch to ON (it turns red).
+5. Click **Send Notification**.
 
 ### What to Observe
 
