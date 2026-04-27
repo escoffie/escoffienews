@@ -24,6 +24,12 @@ The project follows a **Contract-First** approach with SOLID principles at its c
 
 See the [Architecture & Data Models](docs/architecture.md) for a detailed ER diagram and flow description.
 
+## ⚖️ Scope & Constraints (Coding Challenge Context)
+
+While this application implements production-grade patterns (SOLID, Pub-Sub, Repository, Strategy), certain deliberate architectural trade-offs were made to fit the scope of a technical evaluation:
+
+- **Synchronous Notification Processing:** In a true production environment, the `N * M` loop in `NotificationService` (iterating over users and their channels) would dispatch a Laravel Queue Job (e.g., `SendProviderNotification::dispatch()`). Executing external API requests synchronously will inevitably cause HTTP timeouts at scale. However, for the purpose of this challenge, notifications are executed synchronously to guarantee the system works out-of-the-box without forcing the evaluator to configure Queue workers or Redis infrastructure.
+
 ## 🛠 Setup Instructions
 
 ### Prerequisites
