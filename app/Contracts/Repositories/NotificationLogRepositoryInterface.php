@@ -12,9 +12,11 @@ interface NotificationLogRepositoryInterface
      * Store a notification log entry.
      *
      * @param NotificationData $data
+     * @param int $attempts
+     * @param string $status
      * @return NotificationLog
      */
-    public function log(NotificationData $data): NotificationLog;
+    public function log(NotificationData $data, int $attempts = 1, string $status = 'sent'): NotificationLog;
 
     /**
      * Get all logs ordered by newest.

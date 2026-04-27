@@ -7,12 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class NotificationLog extends Model
 {
     protected $fillable = [
+        'batch_id',
         'user_id',
         'user_name',
         'user_email',
         'category',
         'channel',
         'message',
+        'attempts',
+        'status',
     ];
 
     public function user()

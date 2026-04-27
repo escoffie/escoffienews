@@ -69,7 +69,7 @@ class SendProviderNotificationJob implements ShouldQueue
         $success = $provider->send($this->data);
 
         if ($success) {
-            $log = $logRepository->log($this->data);
+            $log = $logRepository->log($this->data, $this->attempts(), 'sent');
             event(new NotificationLogged($log));
             event(new SystemLogBroadcast('INFO', "Delivered [{$this->channelName}] to {$this->data->userName}."));
         }
@@ -85,6 +85,11 @@ class SendProviderNotificationJob implements ShouldQueue
             'channel' => $this->channelName,
             'error' => $exception->getMessage(),
         ]);
+
+        // Log the permanent failure to history
+        $logRepository = app(NotificationLogRepositoryInterface::class);
+        $log = $logRepository->log($this->data, $this->attempts(), 'failed');
+        event(new NotificationLogged($log));
 
         event(new SystemLogBroadcast(
             'ERROR',

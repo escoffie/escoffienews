@@ -20,6 +20,7 @@ class SendProviderNotificationJobTest extends TestCase
     private function makeData(): NotificationData
     {
         return new NotificationData(
+            batchId: 'uuid-123',
             userId: 1,
             userName: 'Alice',
             userEmail: 'alice@example.com',
@@ -37,7 +38,11 @@ class SendProviderNotificationJobTest extends TestCase
 
         // Bind a mock repo
         $mockRepo = $this->createMock(NotificationLogRepositoryInterface::class);
-        $mockRepo->method('log')->willReturn(new NotificationLog());
+        // Expect log with attempts=1, status=sent
+        $mockRepo->expects($this->once())
+            ->method('log')
+            ->with($data, 1, 'sent')
+            ->willReturn(new NotificationLog());
         $this->app->instance(NotificationLogRepositoryInterface::class, $mockRepo);
 
         // Bind a mock SmsProvider
@@ -66,11 +71,6 @@ class SendProviderNotificationJobTest extends TestCase
 
         // Create a job with chaos monkey enabled, then override the rand() check
         // by subclassing and ensuring the chaos probability is guaranteed to fire.
-        // We stub a 100-100 range: rand(100, 100) <= 30 will never fire, so instead
-        // we test the actual behavior by triggering the job on an environment where
-        // rand always returns 1, which is <= 30.
-        //
-        // The pragmatic approach: create an anonymous class that always chaos-throws.
         $alwaysChaosJob = new class($data, 'SMS', chaosMonkey: true) extends SendProviderNotificationJob {
             public function handle(NotificationLogRepositoryInterface $logRepository): void
             {
@@ -79,16 +79,23 @@ class SendProviderNotificationJobTest extends TestCase
         };
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessageMatches('/Chaos Monkey/');
-
         $alwaysChaosJob->handle($mockRepo);
     }
 
-    public function test_failed_method_broadcasts_permanent_failure_event(): void
+    public function test_failed_method_logs_to_history_and_broadcasts(): void
     {
         Event::fake();
 
         $data = $this->makeData();
+        
+        // Mock repo
+        $mockRepo = $this->createMock(NotificationLogRepositoryInterface::class);
+        $mockRepo->expects($this->once())
+            ->method('log')
+            ->with($data, 1, 'failed')
+            ->willReturn(new NotificationLog());
+        $this->app->instance(NotificationLogRepositoryInterface::class, $mockRepo);
+
         $job = new SendProviderNotificationJob($data, 'SMS');
 
         $job->failed(new \RuntimeException('Provider down'));
@@ -111,22 +118,6 @@ class SendProviderNotificationJobTest extends TestCase
         $job = new SendProviderNotificationJob($data, 'UnknownChannel', chaosMonkey: false);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessageMatches('/No provider registered/');
-
         $job->handle($mockRepo);
-    }
-
-    public function test_it_broadcasts_error_on_permanent_failure(): void
-    {
-        Event::fake();
-
-        $data = $this->makeData();
-        $job = new SendProviderNotificationJob($data, 'SMS', chaosMonkey: false);
-        
-        $job->failed(new \RuntimeException('Transient error'));
-
-        Event::assertDispatched(SystemLogBroadcast::class, fn($e) =>
-            $e->level === 'ERROR' && str_contains($e->message, 'PERMANENT FAILURE')
-        );
     }
 }

@@ -43,7 +43,8 @@ class NotificationApiTest extends TestCase
 
         Event::assertDispatched(MessageReceived::class, function ($event) {
             return $event->category === CategoryType::FINANCE->value &&
-                   $event->message === 'Your bill is ready.';
+                   $event->message === 'Your bill is ready.' &&
+                   !empty($event->batchId);
         });
     }
 
@@ -71,12 +72,15 @@ class NotificationApiTest extends TestCase
 
         // 2. Create dummy logs
         NotificationLog::create([
+            'batch_id' => 'uuid-test',
             'user_id' => $user->id,
             'user_name' => 'John Doe',
             'user_email' => 'john@example.com',
             'category' => 'Finance',
             'channel' => 'Email',
-            'message' => 'Test message'
+            'message' => 'Test message',
+            'attempts' => 1,
+            'status' => 'sent'
         ]);
 
         // 3. Fetch via API
@@ -84,7 +88,7 @@ class NotificationApiTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonCount(1)
-            ->assertJsonFragment(['user_name' => 'John Doe']);
+            ->assertJsonFragment(['user_name' => 'John Doe', 'batch_id' => 'uuid-test']);
     }
 
     public function test_it_accepts_chaos_monkey_flag(): void
@@ -101,7 +105,7 @@ class NotificationApiTest extends TestCase
         $response->assertStatus(202);
 
         Event::assertDispatched(MessageReceived::class, function ($event) {
-            return $event->chaosMonkey === true;
+            return $event->chaosMonkey === true && !empty($event->batchId);
         });
     }
 
@@ -118,7 +122,7 @@ class NotificationApiTest extends TestCase
         $response->assertStatus(202);
 
         Event::assertDispatched(MessageReceived::class, function ($event) {
-            return $event->chaosMonkey === false;
+            return $event->chaosMonkey === false && !empty($event->batchId);
         });
     }
 
@@ -132,6 +136,7 @@ class NotificationApiTest extends TestCase
         ]);
 
         NotificationLog::create([
+            'batch_id' => 'uuid-test-2',
             'user_id' => $user->id,
             'user_name' => 'John Doe',
             'user_email' => 'john@example.com',

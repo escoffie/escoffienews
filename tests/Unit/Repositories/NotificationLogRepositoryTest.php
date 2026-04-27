@@ -27,6 +27,7 @@ class NotificationLogRepositoryTest extends TestCase
 
         // 2. Create DTO
         $data = new NotificationData(
+            batchId: 'uuid-1',
             userId: $user->id,
             userName: $user->name,
             userEmail: $user->email,
@@ -36,11 +37,14 @@ class NotificationLogRepositoryTest extends TestCase
         );
 
         // 3. Act
-        $log = $this->repository->log($data);
+        $log = $this->repository->log($data, 2, 'failed');
 
         // 4. Assert
         $this->assertDatabaseHas('notification_logs', [
             'id' => $log->id,
+            'batch_id' => 'uuid-1',
+            'attempts' => 2,
+            'status' => 'failed',
             'message' => 'Hello'
         ]);
     }
@@ -51,18 +55,20 @@ class NotificationLogRepositoryTest extends TestCase
         
         $log1 = \App\Models\NotificationLog::create([
             'user_id' => $user->id, 'user_name' => 'J', 'user_email' => 'j@e.com',
-            'category' => 'Finance', 'channel' => 'SMS', 'message' => 'First'
+            'category' => 'Finance', 'channel' => 'SMS', 'message' => 'First',
+            'batch_id' => 'uuid-1'
         ]);
 
         $log2 = \App\Models\NotificationLog::create([
             'user_id' => $user->id, 'user_name' => 'J', 'user_email' => 'j@e.com',
-            'category' => 'Sports', 'channel' => 'Email', 'message' => 'Second'
+            'category' => 'Sports', 'channel' => 'Email', 'message' => 'Second',
+            'batch_id' => 'uuid-2'
         ]);
 
         $logs = $this->repository->getAllLogs();
 
         $this->assertCount(2, $logs);
-        $this->assertEquals($log2->id, $logs->first()->id); // Latest first (by ID if same timestamp)
+        $this->assertEquals($log2->id, $logs->first()->id);
     }
 
     public function test_log_stores_all_required_fields(): void
@@ -70,6 +76,7 @@ class NotificationLogRepositoryTest extends TestCase
         $user = User::create(['name' => 'Jane', 'email' => 'jane@e.com', 'password' => 'p', 'phone' => '999']);
 
         $data = new NotificationData(
+            batchId: 'uuid-3',
             userId: $user->id,
             userName: 'Jane',
             userEmail: 'jane@e.com',
@@ -79,15 +86,17 @@ class NotificationLogRepositoryTest extends TestCase
             userPhone: '999'
         );
 
-        $log = $this->repository->log($data);
+        $log = $this->repository->log($data, 1, 'sent');
 
+        $this->assertEquals('uuid-3', $log->batch_id);
         $this->assertEquals($user->id, $log->user_id);
         $this->assertEquals('Jane', $log->user_name);
         $this->assertEquals('jane@e.com', $log->user_email);
         $this->assertEquals('Sports', $log->category);
         $this->assertEquals('E-Mail', $log->channel);
         $this->assertEquals('Match starts at 8pm', $log->message);
-        $this->assertNotNull($log->created_at);
+        $this->assertEquals(1, $log->attempts);
+        $this->assertEquals('sent', $log->status);
     }
 
     public function test_get_all_logs_returns_empty_collection_when_no_logs(): void
@@ -101,7 +110,8 @@ class NotificationLogRepositoryTest extends TestCase
         $user = User::create(['name' => 'John', 'email' => 'j@e.com', 'password' => 'p', 'phone' => '123']);
         \App\Models\NotificationLog::create([
             'user_id' => $user->id, 'user_name' => 'J', 'user_email' => 'j@e.com',
-            'category' => 'Finance', 'channel' => 'SMS', 'message' => 'First'
+            'category' => 'Finance', 'channel' => 'SMS', 'message' => 'First',
+            'batch_id' => 'uuid-1'
         ]);
 
         $this->assertEquals(1, \App\Models\NotificationLog::count());

@@ -35,7 +35,7 @@ class NotificationService
      *  - Each Job has its own retry policy (3 attempts, with backoff).
      *  - A single provider failure does not affect other users or channels.
      */
-    public function notifyByCategory(string $category, string $message, bool $chaosMonkey = false): void
+    public function notifyByCategory(string $category, string $message, bool $chaosMonkey = false, string $batchId = ''): void
     {
         event(new SystemLogBroadcast('INFO', "Initiating notification process for category: {$category}"));
 
@@ -47,6 +47,7 @@ class NotificationService
             foreach ($user->channels as $channel) {
                 if (isset($this->providers[$channel->name])) {
                     $data = new NotificationData(
+                        batchId: $batchId,
                         userId: $user->id,
                         userName: $user->name,
                         userEmail: $user->email,
