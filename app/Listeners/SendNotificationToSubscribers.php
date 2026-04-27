@@ -21,7 +21,8 @@ class SendNotificationToSubscribers
     {
         $this->notificationService->notifyByCategory(
             $event->category,
-            $event->message
+            $event->message,
+            $event->chaosMonkey
         );
     }
 }

@@ -50,7 +50,8 @@ describe('NotificationForm', () => {
         await waitFor(() => {
             expect(api.post).toHaveBeenCalledWith('/notifications', {
                 category: 'Sports',
-                message: 'Test Message'
+                message: 'Test Message',
+                chaos_monkey: false
             });
             expect(screen.getByText(/Notification dispatched successfully/i)).toBeInTheDocument();
         });

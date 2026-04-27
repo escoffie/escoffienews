@@ -14,6 +14,7 @@ class MessageReceived
      */
     public function __construct(
         public string $category,
-        public string $message
+        public string $message,
+        public bool $chaosMonkey = false
     ) {}
 }

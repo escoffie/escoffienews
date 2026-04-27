@@ -31,12 +31,14 @@ class NotificationController extends Controller
         $validated = $request->validate([
             'category' => ['required', 'string', Rule::exists('categories', 'name')],
             'message' => ['required', 'string', 'min:1'],
+            'chaos_monkey' => ['nullable', 'boolean'],
         ]);
 
         // Dispatch the event to trigger the Pub-Sub flow
         event(new MessageReceived(
             $validated['category'],
-            $validated['message']
+            $validated['message'],
+            $validated['chaos_monkey'] ?? false
         ));
 
         return response()->json([

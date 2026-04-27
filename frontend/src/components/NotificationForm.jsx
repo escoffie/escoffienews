@@ -14,6 +14,7 @@ export const NotificationForm = () => {
     const [categories, setCategories] = useState([]);
     const [category, setCategory] = useState('');
     const [message, setMessage] = useState('');
+    const [chaosMonkey, setChaosMonkey] = useState(false);
     const [status, setStatus] = useState('idle'); // idle, loading, success, error
     const [errorMsg, setErrorMsg] = useState('');
 
@@ -29,7 +30,7 @@ export const NotificationForm = () => {
 
         setStatus('loading');
         try {
-            await api.post('/notifications', { category, message });
+            await api.post('/notifications', { category, message, chaos_monkey: chaosMonkey });
             setStatus('success');
             setMessage('');
             setTimeout(() => setStatus('idle'), 3000);
@@ -76,6 +77,24 @@ export const NotificationForm = () => {
                     className="w-full h-32 bg-slate-900/50 border-2 border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-brand-primary transition-colors resize-none"
                     required
                 />
+            </div>
+
+            <div className="flex items-center justify-between p-4 rounded-xl bg-slate-900/50 border border-slate-700/50">
+                <div>
+                    <p className="text-sm font-bold text-slate-300">Chaos Monkey Mode</p>
+                    <p className="text-xs text-slate-500">Simulate random provider failures (30% chance).</p>
+                </div>
+                <button
+                    type="button"
+                    onClick={() => setChaosMonkey(!chaosMonkey)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        chaosMonkey ? 'bg-red-500' : 'bg-slate-700'
+                    }`}
+                >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        chaosMonkey ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                </button>
             </div>
 
             <button

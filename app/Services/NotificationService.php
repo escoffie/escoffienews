@@ -27,7 +27,7 @@ class NotificationService
     /**
      * Notify all users subscribed to a category.
      */
-    public function notifyByCategory(string $category, string $message): void
+    public function notifyByCategory(string $category, string $message, bool $chaosMonkey = false): void
     {
         /*
          * Note for Code Challenge Reviewers:
@@ -50,6 +50,12 @@ class NotificationService
             foreach ($user->channels as $channel) {
                 if (isset($this->providers[$channel->name])) {
                     event(new \App\Events\SystemLogBroadcast('INFO', "Routing message to {$user->name} via {$channel->name}"));
+                    
+                    if ($chaosMonkey && rand(1, 100) <= 30) { // 30% chance of failure
+                        event(new \App\Events\SystemLogBroadcast('ERROR', "Chaos Monkey triggered! Simulated failure for {$user->name} via {$channel->name}"));
+                        continue; // Soft fail, move to next
+                    }
+
                     $data = new NotificationData(
                         userId: $user->id,
                         userName: $user->name,
@@ -60,7 +66,11 @@ class NotificationService
                         userPhone: $user->phone
                     );
 
-                    $this->providers[$channel->name]->send($data);
+                    try {
+                        $this->providers[$channel->name]->send($data);
+                    } catch (\Exception $e) {
+                        event(new \App\Events\SystemLogBroadcast('ERROR', "Failed to send to {$user->name} via {$channel->name}: " . $e->getMessage()));
+                    }
                 }
             }
         }
