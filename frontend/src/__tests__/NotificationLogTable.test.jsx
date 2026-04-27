@@ -123,4 +123,47 @@ describe('NotificationLogTable', () => {
             expect(screen.getByText(/No logs found/i)).toBeInTheDocument();
         });
     });
+
+    it('does not clear logs if user cancels confirmation', async () => {
+        vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+        render(<NotificationLogTable />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Bob')).toBeInTheDocument();
+        });
+
+        const clearButton = screen.getByRole('button', { name: /Clear History/i });
+        fireEvent.click(clearButton);
+
+        // Wait to ensure API is not called
+        await waitFor(() => {
+            expect(api.delete).not.toHaveBeenCalled();
+            expect(screen.getByText('Bob')).toBeInTheDocument();
+        });
+    });
+
+    it('handles API failure gracefully during log clearing', async () => {
+        vi.spyOn(window, 'confirm').mockReturnValue(true);
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+        api.delete.mockRejectedValueOnce(new Error('Network error'));
+
+        render(<NotificationLogTable />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Bob')).toBeInTheDocument();
+        });
+
+        const clearButton = screen.getByRole('button', { name: /Clear History/i });
+        fireEvent.click(clearButton);
+
+        await waitFor(() => {
+            expect(api.delete).toHaveBeenCalledWith('/logs');
+            expect(console.error).toHaveBeenCalledWith('Failed to clear logs', expect.any(Error));
+            // Verify logs remain
+            expect(screen.getByText('Bob')).toBeInTheDocument();
+            // Verify button is not stuck in clearing state
+            expect(clearButton).not.toBeDisabled();
+        });
+    });
 });
