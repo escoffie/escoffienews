@@ -44,6 +44,59 @@ describe('NotificationLogTable', () => {
         });
     });
 
+    it('fetches and displays logs on mount', async () => {
+        render(<NotificationLogTable />);
+        await waitFor(() => {
+            expect(screen.getByText('Bob')).toBeInTheDocument();
+            expect(screen.getByText('Alice')).toBeInTheDocument();
+            expect(screen.getByText('Game tonight!')).toBeInTheDocument();
+        });
+        expect(api.get).toHaveBeenCalledWith('/logs');
+    });
+
+    it('shows empty state when no logs exist', async () => {
+        api.get.mockResolvedValue({ data: [] });
+        render(<NotificationLogTable />);
+        await waitFor(() => {
+            expect(screen.getByText(/No logs found/i)).toBeInTheDocument();
+        });
+    });
+
+    it('prepends new log when WebSocket event fires', async () => {
+        let wsCallback;
+        echo.listen.mockImplementation((event, cb) => {
+            wsCallback = cb;
+            return echo;
+        });
+
+        render(<NotificationLogTable />);
+        await waitFor(() => {
+            expect(screen.getByText('Bob')).toBeInTheDocument();
+        });
+
+        act(() => {
+            wsCallback({
+                log: {
+                    id: 3,
+                    batch_id: 'batch-3',
+                    user_name: 'Charlie',
+                    user_email: 'charlie@example.com',
+                    category: 'Movies',
+                    channel: 'Push Notification',
+                    message: 'New release!',
+                    created_at: '2026-04-26T19:00:00Z',
+                    attempts: 1,
+                    status: 'sent'
+                }
+            });
+        });
+
+        await waitFor(() => {
+            expect(screen.getByText('Charlie')).toBeInTheDocument();
+            expect(screen.getByText('New release!')).toBeInTheDocument();
+        });
+    });
+
     it('displays retry badge when attempts > 1', async () => {
         api.get.mockResolvedValue({ data: [
             { ...MOCK_LOGS[0], attempts: 2 }
@@ -62,7 +115,7 @@ describe('NotificationLogTable', () => {
         await waitFor(() => {
             expect(screen.getByText(/Failed after 3 attempts/i)).toBeInTheDocument();
             const row = screen.getByRole('row', { name: /Bob/i });
-            expect(row).toHaveClass('bg-red-950/40');
+            expect(row).toHaveClass('bg-red-500/10');
         });
     });
 
@@ -75,9 +128,9 @@ describe('NotificationLogTable', () => {
         render(<NotificationLogTable />);
         await waitFor(() => {
             const rows = screen.getAllByRole('row').slice(1); // skip header
-            expect(rows[0]).toHaveClass('bg-slate-800/10'); // Group 1
-            expect(rows[1]).toHaveClass('bg-slate-800/10'); // Group 1
-            expect(rows[2]).toHaveClass('bg-slate-800/30'); // Group 2 (toggled)
+            expect(rows[0]).toHaveClass('bg-slate-900/40'); // Group 1 (even index in map cycle)
+            expect(rows[1]).toHaveClass('bg-slate-900/40'); // Group 1
+            expect(rows[2]).toHaveClass('bg-slate-800/60'); // Group 2 (toggled)
         });
     });
 

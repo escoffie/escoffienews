@@ -1,4 +1,4 @@
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SystemTerminal } from '../components/SystemTerminal';
 import { echo } from '../lib/echo';
@@ -34,5 +34,27 @@ describe('SystemTerminal', () => {
         expect(logEntries).toHaveLength(100);
         expect(screen.getByText('Test message 5')).toBeInTheDocument();
         expect(screen.queryByText('Test message 4')).not.toBeInTheDocument();
+    });
+
+    it('clears logs when clear button is clicked', () => {
+        let logCallback;
+        echo.listen.mockImplementation((event, cb) => {
+            logCallback = cb;
+            return echo;
+        });
+
+        render(<SystemTerminal />);
+        
+        act(() => {
+            logCallback({ level: 'INFO', message: 'First message' });
+        });
+
+        expect(screen.getByText('First message')).toBeInTheDocument();
+
+        const clearButton = screen.getByRole('button', { name: /Clear/i });
+        fireEvent.click(clearButton);
+
+        expect(screen.queryByText('First message')).not.toBeInTheDocument();
+        expect(screen.getByText(/Waiting for system events/i)).toBeInTheDocument();
     });
 });

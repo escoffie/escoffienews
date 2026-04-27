@@ -20,26 +20,30 @@ sequenceDiagram
     participant WS as Laravel Reverb (WebSocket)
 
     Client->>API: POST /api/notifications
-    API->>Event: fire(MessageReceived)
+    Note over API: Generates unique batch_id (UUID)
+    API->>Event: fire(MessageReceived, batch_id)
     API-->>Client: 202 Accepted (immediate)
 
     Event->>Listener: handle(event)
-    Listener->>Service: notifyByCategory(category, message, chaosMonkey)
-    Service->>Queue: dispatch(SendProviderNotificationJob) × N×M
+    Listener->>Service: notifyByCategory(..., batch_id)
+    Service->>Queue: dispatch(SendProviderNotificationJob) × N×M (inherits batch_id)
     Service->>WS: broadcast "N jobs queued"
 
     loop For each Job (async, in worker container)
         Worker->>Provider: send(NotificationData)
+        Note right of Worker: Tracks current attempt count
         alt Chaos Monkey fires (30% chance)
             Provider-->>Worker: throws RuntimeException
             Worker->>WS: broadcast ERROR log
             Worker->>Queue: retry after backoff (5s → 10s → 20s)
         else Delivery succeeds
-            Worker->>Log: persist NotificationLog
+            Worker->>Log: persist NotificationLog (batch_id, attempts, status="sent")
             Worker->>WS: broadcast NotificationLogged event
             Worker->>WS: broadcast "Delivered" INFO log
         end
-        alt All 3 retries exhausted
+        alt All 3 retries exhausted (Permanent Failure)
+            Worker->>Log: persist NotificationLog (batch_id, attempts, status="failed")
+            Worker->>WS: broadcast NotificationLogged event
             Worker->>WS: broadcast PERMANENT FAILURE error
         end
     end
@@ -87,12 +91,15 @@ erDiagram
 
     NOTIFICATION_LOGS {
         bigint id PK
+        uuid batch_id "Grouping ID for multiple users/channels"
         bigint user_id FK "idx: user_id"
         string user_name "denormalized"
         string user_email "denormalized"
         string category "idx: category"
         string channel "idx: channel"
         text message
+        integer attempts "Attempt count at completion"
+        string status "sent or failed"
         timestamp created_at "idx: created_at"
     }
 ```
@@ -103,6 +110,16 @@ erDiagram
 
 - **Repository Pattern**: `UserRepositoryInterface` and `NotificationLogRepositoryInterface` encapsulate all Eloquent logic. This allows for clean unit testing and easy maintenance. For example, the `clearAllLogs()` capability was added to the repository layer to handle history management without polluting the controller.
 - **Strategy Pattern**: Notification delivery is abstracted via `NotificationProviderInterface`, allowing the system to scale to new channels (Slack, Teams, etc.) by simply adding a new class.
+
+## Observability & Traceability
+
+To ensure end-to-end visibility of asynchronous operations, the system implements a **Batch Traceability Pattern**:
+
+1.  **Unique Batch Identity**: Every notification request generates a unique `batch_id` (UUID) at the API entry point (`NotificationController`).
+2.  **DTO Propagation**: This ID is injected into the `NotificationData` DTO and propagated through the queue.
+3.  **Attempt Counters**: The `SendProviderNotificationJob` tracks the exact attempt count using Laravel's `$job->attempts()` and persists it to the database.
+4.  **Permanent Failure Logging**: Unlike standard queue behavior where failed jobs simply disappear into a failed-jobs table, this system logs a historical entry with `status="failed"` when retries are exhausted, allowing the frontend to show red alerts for undelivered messages.
+5.  **UI Grouping**: The frontend uses the `batch_id` to visually group related notifications, allowing users to see exactly which users/channels were part of a single broadcast.
 
 ## Folder Structure
 

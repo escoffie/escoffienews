@@ -24,6 +24,8 @@ export const SystemTerminal = () => {
         }
     }, [logs]);
 
+    const clearLogs = () => setLogs([]);
+
     return (
         <div className="flex flex-col h-[300px] bg-black/80 rounded-lg border border-slate-700 font-mono text-xs overflow-hidden shadow-inner">
             <div className="flex items-center justify-between px-3 py-2 bg-slate-800/50 border-b border-slate-700">
@@ -31,10 +33,20 @@ export const SystemTerminal = () => {
                     <TerminalIcon size={14} className="text-emerald-400" />
                     <span className="text-slate-400 uppercase tracking-wider font-bold">System Trace</span>
                 </div>
-                <div className="flex gap-1.5">
-                    <Circle size={8} className="fill-red-500 text-red-500" />
-                    <Circle size={8} className="fill-amber-500 text-amber-500" />
-                    <Circle size={8} className="fill-emerald-500 text-emerald-500" />
+                <div className="flex items-center gap-3">
+                    {logs.length > 0 && (
+                        <button 
+                            onClick={clearLogs}
+                            className="text-[10px] text-slate-500 hover:text-slate-300 transition-colors uppercase font-bold"
+                        >
+                            Clear
+                        </button>
+                    )}
+                    <div className="flex gap-1.5">
+                        <Circle size={8} className="fill-red-500 text-red-500" />
+                        <Circle size={8} className="fill-amber-500 text-amber-500" />
+                        <Circle size={8} className="fill-emerald-500 text-emerald-500" />
+                    </div>
                 </div>
             </div>
             <div 

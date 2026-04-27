@@ -92,22 +92,35 @@ export const NotificationLogTable = () => {
                         <AnimatePresence initial={false}>
                             {logsWithGrouping.map((log) => {
                                 const isFailed = log.status === 'failed';
+                                const isEvenGroup = log.groupIdx === 0;
+                                
+                                // Higher contrast backgrounds
                                 const bgClass = isFailed 
-                                    ? 'bg-red-950/40 border-red-900/50 hover:bg-red-900/40' 
-                                    : log.groupIdx === 0 
-                                        ? 'bg-slate-800/30 border-slate-700/50 hover:bg-slate-800/50' 
-                                        : 'bg-slate-800/10 border-slate-700/30 hover:bg-slate-800/20';
+                                    ? 'bg-red-500/10 border-red-500/20 hover:bg-red-500/15' 
+                                    : isEvenGroup 
+                                        ? 'bg-slate-800/60 border-slate-700/50 hover:bg-slate-800/80' 
+                                        : 'bg-slate-900/40 border-slate-800/50 hover:bg-slate-900/60';
+
+                                // Color indicator for the group
+                                const accentClass = isFailed 
+                                    ? 'bg-red-500' 
+                                    : isEvenGroup ? 'bg-brand-primary' : 'bg-slate-600';
 
                                 return (
                                     <motion.tr 
                                         key={log.id}
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        className={`${bgClass} transition-colors group rounded-lg border-y`}
+                                        className={`${bgClass} transition-colors group rounded-lg border-y relative`}
                                     >
-                                        <td className="px-4 py-4 rounded-l-lg border-l border-inherit">
-                                            <div className={`font-medium ${isFailed ? 'text-red-200' : 'text-slate-200'}`}>{log.user_name}</div>
-                                            <div className="text-xs text-slate-500">{log.user_email}</div>
+                                        <td className="px-4 py-4 rounded-l-lg border-l border-inherit relative">
+                                            {/* Group Accent Bar */}
+                                            <div className={`absolute left-0 top-2 bottom-2 w-1 rounded-r ${accentClass} opacity-70 group-hover:opacity-100 transition-opacity`} />
+                                            
+                                            <div className="pl-2">
+                                                <div className={`font-medium ${isFailed ? 'text-red-200' : 'text-slate-200'}`}>{log.user_name}</div>
+                                                <div className="text-xs text-slate-500">{log.user_email}</div>
+                                            </div>
                                         </td>
                                         <td className="px-4 py-4 border-inherit">
                                             <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${isFailed ? 'bg-red-900/50 text-red-200' : 'bg-slate-700/50 text-slate-300'}`}>
