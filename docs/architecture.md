@@ -99,6 +99,11 @@ erDiagram
 
 > **Why denormalize `user_name` and `user_email`?** Log integrity. If a user is later updated or deleted, the historical log still reflects the exact data at delivery time.
 
+## Key Patterns & Responsibility
+
+- **Repository Pattern**: `UserRepositoryInterface` and `NotificationLogRepositoryInterface` encapsulate all Eloquent logic. This allows for clean unit testing and easy maintenance. For example, the `clearAllLogs()` capability was added to the repository layer to handle history management without polluting the controller.
+- **Strategy Pattern**: Notification delivery is abstracted via `NotificationProviderInterface`, allowing the system to scale to new channels (Slack, Teams, etc.) by simply adding a new class.
+
 ## Folder Structure
 
 ```
