@@ -86,4 +86,39 @@ class NotificationApiTest extends TestCase
             ->assertJsonCount(1)
             ->assertJsonFragment(['user_name' => 'John Doe']);
     }
+
+    public function test_it_accepts_chaos_monkey_flag(): void
+    {
+        Event::fake();
+        Category::create(['name' => CategoryType::FINANCE->value]);
+
+        $response = $this->postJson('/api/notifications', [
+            'category'     => CategoryType::FINANCE->value,
+            'message'      => 'Test with chaos.',
+            'chaos_monkey' => true,
+        ]);
+
+        $response->assertStatus(202);
+
+        Event::assertDispatched(MessageReceived::class, function ($event) {
+            return $event->chaosMonkey === true;
+        });
+    }
+
+    public function test_chaos_monkey_defaults_to_false_when_omitted(): void
+    {
+        Event::fake();
+        Category::create(['name' => CategoryType::FINANCE->value]);
+
+        $response = $this->postJson('/api/notifications', [
+            'category' => CategoryType::FINANCE->value,
+            'message'  => 'No chaos.',
+        ]);
+
+        $response->assertStatus(202);
+
+        Event::assertDispatched(MessageReceived::class, function ($event) {
+            return $event->chaosMonkey === false;
+        });
+    }
 }
