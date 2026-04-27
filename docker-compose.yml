@@ -70,6 +70,23 @@ services:
     networks:
       - escoffienews_network
 
+  # Queue Worker
+  worker:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: escoffienews_worker
+    restart: unless-stopped
+    working_dir: /var/www
+    command: php artisan queue:listen --tries=3 --backoff=5,10,20
+    volumes:
+      - .:/var/www
+    depends_on:
+      - db
+      - redis
+    networks:
+      - escoffienews_network
+
   # Redis for Queue/Cache/Broadcasting
   redis:
     image: redis:alpine

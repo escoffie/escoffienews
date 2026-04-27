@@ -19,19 +19,14 @@ abstract class AbstractNotificationProvider implements NotificationProviderInter
      */
     public function send(NotificationData $data): bool
     {
-        try {
-            $success = $this->deliver($data);
+        $success = $this->deliver($data);
 
-            if ($success) {
-                $log = $this->logRepository->log($data);
-                event(new NotificationLogged($log));
-            }
-
-            return $success;
-        } catch (\Exception $e) {
-            Log::error("Failed to send notification via {$this->getChannelName()}: " . $e->getMessage());
-            return false;
+        if ($success) {
+            $log = $this->logRepository->log($data);
+            event(new NotificationLogged($log));
         }
+
+        return $success;
     }
 
     /**

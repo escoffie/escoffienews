@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\DTOs\NotificationData;
+use App\Events\SystemLogBroadcast;
+use App\Jobs\SendProviderNotificationJob;
 use App\Notifications\Channels\Contracts\NotificationProviderInterface;
 
 
@@ -26,36 +28,24 @@ class NotificationService
 
     /**
      * Notify all users subscribed to a category.
+     *
+     * Each user/channel combination is dispatched as an independent queued Job.
+     * This ensures:
+     *  - The HTTP request returns immediately (non-blocking).
+     *  - Each Job has its own retry policy (3 attempts, with backoff).
+     *  - A single provider failure does not affect other users or channels.
      */
     public function notifyByCategory(string $category, string $message, bool $chaosMonkey = false): void
     {
-        /*
-         * Note for Code Challenge Reviewers:
-         * 
-         * If this was a real production app, we would dispatch a Queue Job here 
-         * (e.g. `SendProviderNotification::dispatch(...)`) because executing HTTP requests 
-         * or heavy tasks synchronously in an N*M loop will block the request and cause timeouts.
-         * 
-         * For the purpose of this challenge, I'm executing this synchronously to ensure 
-         * it runs out-of-the-box without requiring the evaluator to configure queue workers
-         * or a Redis instance.
-         */
-        event(new \App\Events\SystemLogBroadcast('INFO', "Initiating notification process for category: {$category}"));
-        
+        event(new SystemLogBroadcast('INFO', "Initiating notification process for category: {$category}"));
+
         $users = $this->userRepository->getSubscribersByCategory($category);
-        
-        event(new \App\Events\SystemLogBroadcast('INFO', "Found " . $users->count() . " subscribers for {$category}"));
+
+        event(new SystemLogBroadcast('INFO', "Found " . $users->count() . " subscribers for {$category}. Queuing jobs..."));
 
         foreach ($users as $user) {
             foreach ($user->channels as $channel) {
                 if (isset($this->providers[$channel->name])) {
-                    event(new \App\Events\SystemLogBroadcast('INFO', "Routing message to {$user->name} via {$channel->name}"));
-                    
-                    if ($chaosMonkey && rand(1, 100) <= 30) { // 30% chance of failure
-                        event(new \App\Events\SystemLogBroadcast('ERROR', "Chaos Monkey triggered! Simulated failure for {$user->name} via {$channel->name}"));
-                        continue; // Soft fail, move to next
-                    }
-
                     $data = new NotificationData(
                         userId: $user->id,
                         userName: $user->name,
@@ -66,13 +56,15 @@ class NotificationService
                         userPhone: $user->phone
                     );
 
-                    try {
-                        $this->providers[$channel->name]->send($data);
-                    } catch (\Exception $e) {
-                        event(new \App\Events\SystemLogBroadcast('ERROR', "Failed to send to {$user->name} via {$channel->name}: " . $e->getMessage()));
-                    }
+                    // Dispatch a queued Job for each user/channel pair.
+                    // The Job handles fault tolerance: if the provider fails (or Chaos Monkey
+                    // throws an exception), the queue worker retries it automatically.
+                    SendProviderNotificationJob::dispatch($data, $channel->name, $chaosMonkey);
+
+                    event(new SystemLogBroadcast('INFO', "Job queued: [{$channel->name}] for {$user->name}."));
                 }
             }
         }
     }
 }
+
