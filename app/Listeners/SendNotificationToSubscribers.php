@@ -22,7 +22,8 @@ class SendNotificationToSubscribers
         $this->notificationService->notifyByCategory(
             $event->category,
             $event->message,
-            $event->chaosMonkey
+            $event->chaosMonkey,
+            $event->batchId
         );
     }
 }

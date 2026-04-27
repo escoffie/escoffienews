@@ -46,17 +46,17 @@ class NotificationServiceTest extends TestCase
         $service = new NotificationService($userRepo);
         $service->addProvider($smsProvider);
         $service->addProvider($emailProvider);
-        $service->notifyByCategory('Finance', 'Test Message');
+        $service->notifyByCategory('Finance', 'Test Message', batchId: 'test-batch-id');
 
         // 4. Assert that Jobs were dispatched to the queue (not executed directly)
         Queue::assertPushed(SendProviderNotificationJob::class, 2);
 
         Queue::assertPushed(SendProviderNotificationJob::class, function ($job) {
-            return $job->channelName === 'SMS';
+            return $job->channelName === 'SMS' && $job->data->batchId === 'test-batch-id';
         });
 
         Queue::assertPushed(SendProviderNotificationJob::class, function ($job) {
-            return $job->channelName === 'E-Mail';
+            return $job->channelName === 'E-Mail' && $job->data->batchId === 'test-batch-id';
         });
 
         // 5. Assert System Logs were dispatched
@@ -84,10 +84,10 @@ class NotificationServiceTest extends TestCase
 
         $service = new NotificationService($userRepo);
         $service->addProvider($smsProvider);
-        $service->notifyByCategory('Finance', 'Test Message', chaosMonkey: true);
+        $service->notifyByCategory('Finance', 'Test Message', chaosMonkey: true, batchId: 'chaos-batch');
 
         Queue::assertPushed(SendProviderNotificationJob::class, function ($job) {
-            return $job->chaosMonkey === true;
+            return $job->chaosMonkey === true && $job->data->batchId === 'chaos-batch';
         });
     }
 }

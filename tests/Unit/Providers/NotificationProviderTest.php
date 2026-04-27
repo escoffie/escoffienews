@@ -36,7 +36,7 @@ class NotificationProviderTest extends TestCase
         $provider = new SmsProvider();
         
         $data = new NotificationData(
-            userId: 1, userName: 'J', userEmail: 'j@e.com',
+            batchId: 'uuid-1', userId: 1, userName: 'J', userEmail: 'j@e.com',
             category: 'Finance', channel: 'SMS', message: 'Hi'
         );
 
@@ -68,7 +68,7 @@ class NotificationProviderTest extends TestCase
         $provider->method('deliver')->willReturn(false);
 
         $data = new NotificationData(
-            userId: 1, userName: 'J', userEmail: 'j@e.com',
+            batchId: 'uuid-2', userId: 1, userName: 'J', userEmail: 'j@e.com',
             category: 'Finance', channel: 'SMS', message: 'Hi'
         );
 

@@ -5,6 +5,7 @@ namespace App\DTOs;
 readonly class NotificationData
 {
     public function __construct(
+        public string $batchId,
         public int $userId,
         public string $userName,
         public string $userEmail,
@@ -20,6 +21,7 @@ readonly class NotificationData
     public static function fromArray(array $data): self
     {
         return new self(
+            batchId: $data['batch_id'],
             userId: $data['user_id'],
             userName: $data['user_name'],
             userEmail: $data['user_email'],

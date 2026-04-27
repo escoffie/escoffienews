@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { History, Mail, MessageSquare, Bell, Clock, Trash2 } from 'lucide-react';
+import { History, Mail, MessageSquare, Bell, Clock, Trash2, AlertTriangle, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { echo } from '../lib/echo';
 import api from '../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -41,11 +41,22 @@ export const NotificationLogTable = () => {
 
     const getIcon = (channel) => {
         const channelLower = channel?.toLowerCase() || '';
-        if (channelLower.includes('sms')) return <MessageSquare size={16} className="text-emerald-400 shrink-0" />;
-        if (channelLower.includes('mail')) return <Mail size={16} className="text-blue-400 shrink-0" />;
-        if (channelLower.includes('push')) return <Bell size={16} className="text-amber-400 shrink-0" />;
-        return <Bell size={16} className="text-slate-400 shrink-0" />;
+        if (channelLower.includes('sms')) return <MessageSquare size={16} className="shrink-0" />;
+        if (channelLower.includes('mail')) return <Mail size={16} className="shrink-0" />;
+        if (channelLower.includes('push')) return <Bell size={16} className="shrink-0" />;
+        return <Bell size={16} className="shrink-0" />;
     };
+
+    // Calculate grouping indices
+    let currentBatchId = null;
+    let currentGroupIdx = 0;
+    const logsWithGrouping = logs.map(log => {
+        if (log.batch_id !== currentBatchId) {
+            currentBatchId = log.batch_id;
+            currentGroupIdx = (currentGroupIdx + 1) % 2;
+        }
+        return { ...log, groupIdx: currentGroupIdx };
+    });
 
     return (
         <div className="flex flex-col h-full relative">
@@ -79,38 +90,87 @@ export const NotificationLogTable = () => {
                     </thead>
                     <tbody>
                         <AnimatePresence initial={false}>
-                            {logs.map((log) => (
-                                <motion.tr 
-                                    key={log.id}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="bg-slate-800/30 hover:bg-slate-800/60 transition-colors group rounded-lg"
-                                >
-                                    <td className="px-4 py-4 rounded-l-lg border-y border-l border-slate-700/50">
-                                        <div className="font-medium text-slate-200">{log.user_name}</div>
-                                        <div className="text-xs text-slate-500">{log.user_email}</div>
-                                    </td>
-                                    <td className="px-4 py-4 border-y border-slate-700/50">
-                                        <span className="px-2 py-1 bg-slate-700/50 rounded text-[10px] font-bold uppercase text-slate-300">
-                                            {log.category}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-4 border-y border-slate-700/50">
-                                        <div className="flex items-center gap-2 text-sm text-slate-300 truncate">
-                                            {getIcon(log.channel)}
-                                            <span className="truncate">{log.channel}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-4 border-y border-slate-700/50">
-                                        <p className="text-sm text-slate-400 break-words line-clamp-2 hover:line-clamp-none transition-all duration-300">
-                                            {log.message}
-                                        </p>
-                                    </td>
-                                    <td className="px-4 py-4 rounded-r-lg border-y border-r border-slate-700/50 text-xs text-slate-500 whitespace-nowrap">
-                                        {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </td>
-                                </motion.tr>
-                            ))}
+                            {logsWithGrouping.map((log) => {
+                                const isFailed = log.status === 'failed';
+                                const isEvenGroup = log.groupIdx === 0;
+                                
+                                // Higher contrast backgrounds
+                                const bgClass = isFailed 
+                                    ? 'bg-red-500/10 border-red-500/20 hover:bg-red-500/15' 
+                                    : isEvenGroup 
+                                        ? 'bg-slate-800/60 border-slate-700/50 hover:bg-slate-800/80' 
+                                        : 'bg-slate-900/40 border-slate-800/50 hover:bg-slate-900/60';
+
+                                // Color indicator for the group
+                                const accentClass = isFailed 
+                                    ? 'bg-red-500' 
+                                    : isEvenGroup ? 'bg-brand-primary' : 'bg-slate-600';
+
+                                return (
+                                    <motion.tr 
+                                        key={log.id}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className={`${bgClass} transition-colors group rounded-lg border-y relative`}
+                                    >
+                                        <td className="px-4 py-4 rounded-l-lg border-l border-inherit relative">
+                                            {/* Group Accent Bar */}
+                                            <div className={`absolute left-0 top-2 bottom-2 w-1 rounded-r ${accentClass} opacity-70 group-hover:opacity-100 transition-opacity`} />
+                                            
+                                            <div className="pl-2">
+                                                <div className={`font-medium ${isFailed ? 'text-red-200' : 'text-slate-200'}`}>{log.user_name}</div>
+                                                <div className="text-xs text-slate-500">{log.user_email}</div>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-4 border-inherit">
+                                            <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${isFailed ? 'bg-red-900/50 text-red-200' : 'bg-slate-700/50 text-slate-300'}`}>
+                                                {log.category}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-4 border-inherit">
+                                            <div className={`flex items-center gap-2 text-sm truncate ${isFailed ? 'text-red-300' : 'text-slate-300'}`}>
+                                                <span className={isFailed ? 'text-red-400' : log.channel.includes('SMS') ? 'text-emerald-400' : log.channel.includes('Mail') ? 'text-blue-400' : 'text-amber-400'}>
+                                                    {getIcon(log.channel)}
+                                                </span>
+                                                <span className="truncate">{log.channel}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-4 border-inherit">
+                                            <div className="space-y-1">
+                                                <p className={`text-sm break-words line-clamp-2 hover:line-clamp-none transition-all duration-300 ${isFailed ? 'text-red-400/80 italic' : 'text-slate-400'}`}>
+                                                    {log.message}
+                                                </p>
+                                                <div className="flex gap-2">
+                                                    {isFailed && (
+                                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-400 uppercase bg-red-400/10 px-1.5 py-0.5 rounded border border-red-400/20">
+                                                            <AlertCircle size={10} />
+                                                            Failed after {log.attempts} attempts
+                                                        </span>
+                                                    )}
+                                                    {!isFailed && log.attempts > 1 && (
+                                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400 uppercase bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20">
+                                                            <AlertTriangle size={10} />
+                                                            Delivered after {log.attempts} attempts
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-4 rounded-r-lg border-r border-inherit text-xs text-slate-500 whitespace-nowrap">
+                                            <div className="flex flex-col items-end gap-1">
+                                                <span>{new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                {isFailed ? (
+                                                    <AlertCircle size={14} className="text-red-500" />
+                                                ) : log.attempts > 1 ? (
+                                                    <AlertTriangle size={14} className="text-amber-500" />
+                                                ) : (
+                                                    <CheckCircle2 size={14} className="text-emerald-500/50" />
+                                                )}
+                                            </div>
+                                        </td>
+                                    </motion.tr>
+                                );
+                            })}
                         </AnimatePresence>
                     </tbody>
                 </table>

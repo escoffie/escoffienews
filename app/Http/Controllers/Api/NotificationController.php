@@ -7,6 +7,7 @@ use App\Events\MessageReceived;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class NotificationController extends Controller
@@ -38,7 +39,8 @@ class NotificationController extends Controller
         event(new MessageReceived(
             $validated['category'],
             $validated['message'],
-            $validated['chaos_monkey'] ?? false
+            $validated['chaos_monkey'] ?? false,
+            (string) Str::uuid()
         ));
 
         return response()->json([
