@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UserManagement } from '../components/UserManagement';
 import api from '../lib/api';
@@ -17,7 +17,11 @@ describe('UserManagement', () => {
     it('renders the title and form elements', async () => {
         render(<UserManagement />);
 
-        expect(screen.getByText(/Simple New User Request/i)).toBeInTheDocument();
+        // Wait for the initial api.get('/users') to settle
+        await waitFor(() => {
+            expect(screen.getByText(/Simple New User Request/i)).toBeInTheDocument();
+        });
+
         expect(screen.getByText(/POST \/api\/users/i)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Send Request/i })).toBeInTheDocument();
     });

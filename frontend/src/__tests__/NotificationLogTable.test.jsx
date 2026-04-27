@@ -31,9 +31,13 @@ describe('NotificationLogTable', () => {
         api.get.mockResolvedValue({ data: MOCK_LOGS });
     });
 
-    it('renders the heading', () => {
+    it('renders the heading', async () => {
         render(<NotificationLogTable />);
-        expect(screen.getByText(/Notification History/i)).toBeInTheDocument();
+
+        // Wait for the initial api.get('/logs') to settle
+        await waitFor(() => {
+            expect(screen.getByText(/Notification History/i)).toBeInTheDocument();
+        });
     });
 
     it('fetches and displays logs on mount', async () => {
