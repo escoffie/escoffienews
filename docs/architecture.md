@@ -153,6 +153,15 @@ app/
     └── NotificationService.php  # Orchestrates queue dispatch
 ```
 
+## Security & Authentication
+
+The system implements a **Simple Admin Authentication** layer to protect the dashboard and API endpoints:
+
+1.  **Token-Based Middleware**: All `/api` routes are protected by the `AdminAuthMiddleware`. It validates an `Authorization` header against the `ADMIN_TOKEN` defined in the environment.
+2.  **Frontend Auth Gate**: The React application uses a conditional rendering pattern (`App.jsx`) to show a `LoginPage` if no valid token is found in `localStorage`.
+3.  **Axios Interceptor**: Outgoing API requests automatically inject the stored token into the `Authorization` header via a request interceptor in `lib/api.js`.
+4.  **Automatic Test Authentication**: The base `TestCase.php` is configured to inject the correct token into all test requests by default, ensuring high developer velocity while maintaining security.
+
 ## Adding a New Notification Channel
 
 The Strategy Pattern makes this a minimal change:
