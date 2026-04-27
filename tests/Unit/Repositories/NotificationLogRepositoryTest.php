@@ -95,4 +95,19 @@ class NotificationLogRepositoryTest extends TestCase
         $logs = $this->repository->getAllLogs();
         $this->assertCount(0, $logs);
     }
+
+    public function test_it_can_clear_all_logs(): void
+    {
+        $user = User::create(['name' => 'John', 'email' => 'j@e.com', 'password' => 'p', 'phone' => '123']);
+        \App\Models\NotificationLog::create([
+            'user_id' => $user->id, 'user_name' => 'J', 'user_email' => 'j@e.com',
+            'category' => 'Finance', 'channel' => 'SMS', 'message' => 'First'
+        ]);
+
+        $this->assertEquals(1, \App\Models\NotificationLog::count());
+
+        $this->repository->clearAllLogs();
+
+        $this->assertEquals(0, \App\Models\NotificationLog::count());
+    }
 }

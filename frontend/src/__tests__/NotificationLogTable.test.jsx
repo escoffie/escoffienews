@@ -1,4 +1,4 @@
-import { render, screen, act, waitFor } from '@testing-library/react';
+import { render, screen, act, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotificationLogTable } from '../components/NotificationLogTable';
 import { echo } from '../lib/echo';
@@ -101,6 +101,26 @@ describe('NotificationLogTable', () => {
             // Channels are rendered in the table — we check by the log rows
             expect(screen.getByText('SMS')).toBeInTheDocument();
             expect(screen.getByText('E-Mail')).toBeInTheDocument();
+        });
+    });
+
+    it('clears logs when button is clicked', async () => {
+        vi.spyOn(window, 'confirm').mockReturnValue(true);
+        api.delete.mockResolvedValueOnce({ data: { message: 'Success' } });
+
+        render(<NotificationLogTable />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Bob')).toBeInTheDocument();
+        });
+
+        const clearButton = screen.getByRole('button', { name: /Clear History/i });
+        fireEvent.click(clearButton);
+
+        await waitFor(() => {
+            expect(api.delete).toHaveBeenCalledWith('/logs');
+            expect(screen.queryByText('Bob')).not.toBeInTheDocument();
+            expect(screen.getByText(/No logs found/i)).toBeInTheDocument();
         });
     });
 });

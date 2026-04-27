@@ -106,7 +106,7 @@ docker-compose exec app php artisan test
 docker-compose exec frontend npm test
 ```
 
-**Current Coverage:** 41 backend tests (111 assertions) · 17 frontend tests — all passing.
+**Current Coverage:** 43 backend tests (117 assertions) · 18 frontend tests — all passing.
 
 ---
 
@@ -178,6 +178,9 @@ Dispatch a notification to all users subscribed to a category.
 
 ### `GET /api/logs`
 Returns all notification delivery logs, sorted newest-to-oldest.
+
+### `DELETE /api/logs`
+Clears all notification delivery logs from the database.
 
 ### `GET /api/categories`
 Returns all available categories (seeded from the database).

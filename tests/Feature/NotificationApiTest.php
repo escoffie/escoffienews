@@ -121,4 +121,32 @@ class NotificationApiTest extends TestCase
             return $event->chaosMonkey === false;
         });
     }
+
+    public function test_it_can_clear_all_logs_via_api(): void
+    {
+        $user = User::create([
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'password' => bcrypt('password'),
+            'phone' => '12345'
+        ]);
+
+        NotificationLog::create([
+            'user_id' => $user->id,
+            'user_name' => 'John Doe',
+            'user_email' => 'john@example.com',
+            'category' => 'Finance',
+            'channel' => 'Email',
+            'message' => 'Test message'
+        ]);
+
+        $this->assertEquals(1, NotificationLog::count());
+
+        $response = $this->deleteJson('/api/logs');
+
+        $response->assertStatus(200)
+            ->assertJson(['message' => 'Logs cleared successfully']);
+
+        $this->assertEquals(0, NotificationLog::count());
+    }
 }

@@ -45,4 +45,13 @@ class NotificationController extends Controller
             'message' => 'Notification request received and queued for delivery.',
         ], 202);
     }
+
+    /**
+     * Remove all notification logs from the system.
+     */
+    public function destroyAll(): JsonResponse
+    {
+        $this->logRepository->clearAllLogs();
+        return response()->json(['message' => 'Logs cleared successfully']);
+    }
 }

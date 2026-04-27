@@ -22,4 +22,9 @@ interface NotificationLogRepositoryInterface
      * @return Collection
      */
     public function getAllLogs(): Collection;
+
+    /**
+     * Delete all notification logs from the database.
+     */
+    public function clearAllLogs(): void;
 }

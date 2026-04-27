@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { History, Mail, MessageSquare, Bell, Clock } from 'lucide-react';
+import { History, Mail, MessageSquare, Bell, Clock, Trash2 } from 'lucide-react';
 import { echo } from '../lib/echo';
 import api from '../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const NotificationLogTable = () => {
     const [logs, setLogs] = useState([]);
+    const [isClearing, setIsClearing] = useState(false);
 
     useEffect(() => {
         // Initial fetch
@@ -24,6 +25,20 @@ export const NotificationLogTable = () => {
         };
     }, []);
 
+    const clearLogs = async () => {
+        if (!confirm('Are you sure you want to clear all notification logs?')) return;
+        
+        setIsClearing(true);
+        try {
+            await api.delete('/logs');
+            setLogs([]);
+        } catch (err) {
+            console.error('Failed to clear logs', err);
+        } finally {
+            setIsClearing(false);
+        }
+    };
+
     const getIcon = (channel) => {
         const channelLower = channel?.toLowerCase() || '';
         if (channelLower.includes('sms')) return <MessageSquare size={16} className="text-emerald-400 shrink-0" />;
@@ -34,9 +49,21 @@ export const NotificationLogTable = () => {
 
     return (
         <div className="flex flex-col h-full relative">
-            <div className="flex items-center gap-2 mb-4">
-                <History className="text-brand-primary shrink-0" size={20} />
-                <h2 className="text-xl font-bold text-slate-200">Notification History</h2>
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                    <History className="text-brand-primary shrink-0" size={20} />
+                    <h2 className="text-xl font-bold text-slate-200">Notification History</h2>
+                </div>
+                {logs.length > 0 && (
+                    <button
+                        onClick={clearLogs}
+                        disabled={isClearing}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold rounded-lg border border-red-500/20 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
+                    >
+                        <Trash2 size={14} className="group-hover:scale-110 transition-transform" />
+                        {isClearing ? 'Clearing...' : 'Clear History'}
+                    </button>
+                )}
             </div>
             
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar relative">

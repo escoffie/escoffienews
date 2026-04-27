@@ -36,4 +36,12 @@ class NotificationLogRepository implements NotificationLogRepositoryInterface
     {
         return NotificationLog::with('user')->orderByDesc('created_at')->orderByDesc('id')->limit(100)->get();
     }
+
+    /**
+     * Delete all notification logs from the database.
+     */
+    public function clearAllLogs(): void
+    {
+        NotificationLog::truncate();
+    }
 }
