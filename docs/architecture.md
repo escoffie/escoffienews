@@ -35,9 +35,9 @@ sequenceDiagram
             Worker->>WS: broadcast ERROR log
             Worker->>Queue: retry after backoff (5s → 10s → 20s)
         else Delivery succeeds
-            Provider->>Log: persist NotificationLog
-            Provider->>WS: broadcast NotificationLogged event
-            Provider->>WS: broadcast "Delivered" INFO log
+            Worker->>Log: persist NotificationLog
+            Worker->>WS: broadcast NotificationLogged event
+            Worker->>WS: broadcast "Delivered" INFO log
         end
         alt All 3 retries exhausted
             Worker->>WS: broadcast PERMANENT FAILURE error

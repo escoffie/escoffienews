@@ -116,27 +116,13 @@ class SendProviderNotificationJobTest extends TestCase
         $job->handle($mockRepo);
     }
 
-    public function test_it_logs_retry_attempt_number_in_terminal(): void
+    public function test_it_broadcasts_error_on_permanent_failure(): void
     {
         Event::fake();
 
         $data = $this->makeData();
-        $mockRepo = $this->createMock(NotificationLogRepositoryInterface::class);
-        $mockRepo->method('log')->willReturn(new NotificationLog());
-
-        $mockProvider = $this->getMockBuilder(SmsProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockProvider->method('getChannelName')->willReturn('SMS');
-        $mockProvider->method('send')->willReturn(true);
-
-        $this->app->tag([$mockProvider::class], 'notification.providers');
-        $this->app->instance($mockProvider::class, $mockProvider);
-
-        // Simulate a job on its 2nd attempt
         $job = new SendProviderNotificationJob($data, 'SMS', chaosMonkey: false);
-        // Force attempts() > 1 by checking the INFO retry log
-        // Since attempts() is managed by the queue, we test that failed() correctly fires
+        
         $job->failed(new \RuntimeException('Transient error'));
 
         Event::assertDispatched(SystemLogBroadcast::class, fn($e) =>

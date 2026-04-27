@@ -80,4 +80,35 @@ describe('NotificationForm', () => {
             expect(screen.getByText(/Validation Error/i)).toBeInTheDocument();
         });
     });
+
+    it('submits with chaos_monkey: true when toggle is enabled', async () => {
+        api.post.mockResolvedValueOnce({ data: { message: 'Success' } });
+
+        render(<NotificationForm />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Sports')).toBeInTheDocument();
+        });
+
+        // Select category and type message
+        fireEvent.click(screen.getByText('Sports'));
+        fireEvent.change(screen.getByPlaceholderText(/Enter the notification message here/i), {
+            target: { value: 'Chaos test' }
+        });
+
+        // Toggle Chaos Monkey ON (the button inside the toggle row)
+        const chaosToggle = screen.getByRole('button', { name: '' });
+        fireEvent.click(chaosToggle);
+
+        // Submit
+        fireEvent.click(screen.getByRole('button', { name: /Send Notification/i }));
+
+        await waitFor(() => {
+            expect(api.post).toHaveBeenCalledWith('/notifications', {
+                category: 'Sports',
+                message: 'Chaos test',
+                chaos_monkey: true,
+            });
+        });
+    });
 });

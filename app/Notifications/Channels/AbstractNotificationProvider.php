@@ -2,31 +2,20 @@
 
 namespace App\Notifications\Channels;
 
-use App\Contracts\Repositories\NotificationLogRepositoryInterface;
 use App\DTOs\NotificationData;
-use App\Events\NotificationLogged;
 use App\Notifications\Channels\Contracts\NotificationProviderInterface;
-use Illuminate\Support\Facades\Log;
 
 abstract class AbstractNotificationProvider implements NotificationProviderInterface
 {
-    public function __construct(
-        protected NotificationLogRepositoryInterface $logRepository
-    ) {}
-
     /**
-     * Common logic for all notifications.
+     * Delegate delivery to the concrete provider implementation.
+     * 
+     * Logging and event broadcasting are handled by SendProviderNotificationJob,
+     * which calls this method. Keeping them here would cause double-logging.
      */
     public function send(NotificationData $data): bool
     {
-        $success = $this->deliver($data);
-
-        if ($success) {
-            $log = $this->logRepository->log($data);
-            event(new NotificationLogged($log));
-        }
-
-        return $success;
+        return $this->deliver($data);
     }
 
     /**
