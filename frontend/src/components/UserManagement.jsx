@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, Send, AlertCircle, CheckCircle2, UserPlus } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import api from '../lib/api';
+import { TIMEOUTS, UI_LIMITS } from '../lib/constants';
 
 const DEFAULT_USER_JSON = `{
   "name": "Jane Doe",
@@ -47,7 +48,7 @@ export const UserManagement = () => {
                 setStatus('idle');
                 setMessage('');
                 setJsonPayload(DEFAULT_USER_JSON);
-            }, 3000);
+            }, TIMEOUTS.FORM_RESET_MS);
         } catch (err) {
             setStatus('error');
             if (err instanceof SyntaxError) {
@@ -120,14 +121,14 @@ export const UserManagement = () => {
                     <h3 className="text-sm font-bold text-slate-300 uppercase tracking-widest">Current Users ({users.length})</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    {users.slice(0, 10).map(u => (
+                    {users.slice(0, UI_LIMITS.USER_CHIPS_PREVIEW).map(u => (
                         <span key={u.id} className="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded-md border border-slate-700">
                             {u.name}
                         </span>
                     ))}
-                    {users.length > 10 && (
+                    {users.length > UI_LIMITS.USER_CHIPS_PREVIEW && (
                         <span className="text-xs bg-slate-800/50 text-slate-500 px-2 py-1 rounded-md border border-slate-800">
-                            +{users.length - 10} more
+                            +{users.length - UI_LIMITS.USER_CHIPS_PREVIEW} more
                         </span>
                     )}
                 </div>
