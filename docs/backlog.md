@@ -45,4 +45,4 @@ This backlog follows a "Divide and Conquer" approach, organized by milestones. E
 - [x] [DEV-605] Observability: Batch grouping, retry tracking, and failure logging.
 
 ## Phase 7: Bonus - Security & Polish [DEV-007]
-- [ ] [DEV-701] Simple Admin Authentication layer.
+- [x] [DEV-701] Simple Admin Authentication layer.

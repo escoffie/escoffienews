@@ -7,9 +7,17 @@ import { UserManagement } from './components/UserManagement';
 import { Zap, Activity } from 'lucide-react';
 import { echo } from './lib/echo';
 import { Toaster, toast } from 'sonner';
+import { LoginPage } from './components/LoginPage';
+import { LogOut } from 'lucide-react';
 
 function App() {
   const [isConnected, setIsConnected] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('admin_token'));
+
+  const handleLogout = () => {
+    localStorage.removeItem('admin_token');
+    setIsAuthenticated(false);
+  };
 
   useEffect(() => {
     // Listen for pusher state changes
@@ -40,6 +48,10 @@ function App() {
       channel.stopListening('.system.log');
     };
   }, []);
+
+  if (!isAuthenticated) {
+    return <LoginPage onLogin={() => setIsAuthenticated(true)} />;
+  }
 
   return (
     <div className="min-h-screen bg-[#0f172a] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-900 to-black p-6 lg:p-12">
@@ -78,6 +90,14 @@ function App() {
                 {isConnected ? 'Live Sync' : 'Disconnected'}
               </span>
             </div>
+            <div className="h-8 w-px bg-slate-800" />
+            <button 
+              onClick={handleLogout}
+              className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
+              title="Logout"
+            >
+              <LogOut size={20} />
+            </button>
           </div>
         </header>
 

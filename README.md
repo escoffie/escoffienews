@@ -106,7 +106,7 @@ docker-compose exec app php artisan test
 docker-compose exec frontend npm test
 ```
 
-**Current Coverage:** 43 backend tests (117 assertions) · 18 frontend tests — all passing.
+**Current Coverage:** 43 backend tests · 21 frontend tests — all passing.
 
 ---
 
