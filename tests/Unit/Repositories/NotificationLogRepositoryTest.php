@@ -64,4 +64,35 @@ class NotificationLogRepositoryTest extends TestCase
         $this->assertCount(2, $logs);
         $this->assertEquals($log2->id, $logs->first()->id); // Latest first (by ID if same timestamp)
     }
+
+    public function test_log_stores_all_required_fields(): void
+    {
+        $user = User::create(['name' => 'Jane', 'email' => 'jane@e.com', 'password' => 'p', 'phone' => '999']);
+
+        $data = new NotificationData(
+            userId: $user->id,
+            userName: 'Jane',
+            userEmail: 'jane@e.com',
+            category: 'Sports',
+            channel: 'E-Mail',
+            message: 'Match starts at 8pm',
+            userPhone: '999'
+        );
+
+        $log = $this->repository->log($data);
+
+        $this->assertEquals($user->id, $log->user_id);
+        $this->assertEquals('Jane', $log->user_name);
+        $this->assertEquals('jane@e.com', $log->user_email);
+        $this->assertEquals('Sports', $log->category);
+        $this->assertEquals('E-Mail', $log->channel);
+        $this->assertEquals('Match starts at 8pm', $log->message);
+        $this->assertNotNull($log->created_at);
+    }
+
+    public function test_get_all_logs_returns_empty_collection_when_no_logs(): void
+    {
+        $logs = $this->repository->getAllLogs();
+        $this->assertCount(0, $logs);
+    }
 }
