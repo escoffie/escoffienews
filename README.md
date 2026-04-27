@@ -75,6 +75,24 @@ docker-compose up -d --build
 
 ---
 
+## 🛠 Makefile Commands
+
+For convenience, a `Makefile` is included to simplify common tasks:
+
+| Command | Description |
+|---|---|
+| `make setup` | Full initial setup (env, build, install, migrate, seed) |
+| `make up` | Start all services in the background |
+| `make down` | Stop and remove all containers |
+| `make restart` | Restart all services |
+| `make build` | Rebuild all docker images |
+| `make test` | Run all backend (PHPUnit) and frontend (Vitest) tests |
+| `make migrate` | Run database migrations |
+| `make seed` | Run database seeders |
+| `make shell` | Open a shell inside the `app` container |
+
+---
+
 ## 🧪 Running the Test Suite
 
 ```bash
