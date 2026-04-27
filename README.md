@@ -21,6 +21,9 @@ EscoffieNews receives messages for a given category (Sports, Finance, Movies) an
 | **Security** | Simple Token-based authentication for API & Dashboard |
 | **Docker** | Fully containerized — runs with a single command |
 
+> [!NOTE]
+> **Delivery Simulation:** To maintain portability and avoid external dependencies, this system simulates actual delivery. The "Providers" (SMS, Email, Push) are implemented as mock classes that mimic network latency and non-deterministic failures, allowing the full fault-tolerance pipeline to be observed without real-world costs or credentials.
+
 ---
 
 ## 🏗 Architecture
